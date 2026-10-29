@@ -1,0 +1,12 @@
+{
+  "name": "alas-daun",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
