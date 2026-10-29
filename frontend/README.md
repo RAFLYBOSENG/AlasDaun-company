@@ -9,8 +9,12 @@ npm install
 npm run dev
 ```
 
-Variabel environment frontend disimpan di `.env`. Jalankan backend di terminal
-lain agar reservasi tersimpan ke Neon:
+Untuk deploy ke Vercel, gunakan folder root project ini sebagai **Root
+Directory**. Vercel akan membuild `frontend` dan menjalankan endpoint Neon
+secara serverless.
+
+Untuk development lokal, jalankan backend di terminal lain agar reservasi
+tersimpan ke Neon:
 
 ```bash
 cd ../backend

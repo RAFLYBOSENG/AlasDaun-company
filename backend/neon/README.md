@@ -44,3 +44,28 @@ Invoke-RestMethod http://localhost:3001/api/health/db
 Jika berhasil, hasilnya memiliki `connected: True`, nama database Neon, dan
 waktu server PostgreSQL. Jika gagal, periksa `DATABASE_URL`, pastikan schema
 dan project Neon aktif, lalu lihat pesan error pada terminal backend.
+
+## Deploy ke Vercel
+
+Import repository/project ini ke Vercel dengan **Root Directory** tetap di
+root project, bukan `frontend` atau `backend`. Konfigurasi pada `vercel.json`
+akan membuild frontend dan memakai `api/[...path].js` sebagai Vercel
+Serverless Function.
+
+Tambahkan Environment Variables berikut di Vercel untuk environment
+`Production` dan `Preview`:
+
+```text
+DATABASE_URL=connection-string-dari-Neon
+ADMIN_EMAIL=alamat-email-admin
+ADMIN_PASSWORD=password-admin-yang-kuat
+SESSION_SECRET=random-secret-panjang
+```
+
+Jangan menambahkan `DATABASE_URL` sebagai `VITE_*`. Setelah deploy, tes:
+
+```text
+https://domain-vercel-anda.vercel.app/api/health/db
+```
+
+Frontend otomatis memakai URL `/api` dari domain Vercel yang sama.
