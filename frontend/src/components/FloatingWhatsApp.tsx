@@ -1,5 +1,5 @@
 import { useLang } from '../lib/LanguageContext';
-import { openWhatsApp } from '../lib/supabase';
+import { openWhatsApp } from '../lib/api';
 
 export function FloatingWhatsApp() {
   const { lang } = useLang();

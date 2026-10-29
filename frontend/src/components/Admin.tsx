@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Lock, LogOut, Leaf, ArrowLeft, Phone, Users, Calendar, Clock, MapPin, StickyNote, Loader2 } from 'lucide-react';
-import { supabase, fetchReservations, type Reservation } from '../lib/supabase';
+import { fetchReservations, hasSession, login, logout as clearAdminSession, type Reservation } from '../lib/api';
 import { useLang } from '../lib/LanguageContext';
 
 export function Admin() {
@@ -8,7 +8,6 @@ export function Admin() {
   const [session, setSession] = useState<boolean | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [authError, setAuthError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -26,11 +25,7 @@ export function Admin() {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(!!s);
-    });
-    return () => sub.subscription.unsubscribe();
+    setSession(hasSession());
   }, []);
 
   useEffect(() => {
@@ -44,13 +39,8 @@ export function Admin() {
     setAuthError(null);
     setBusy(true);
     try {
-      if (mode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-      }
+      await login(email, password);
+      setSession(true);
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -59,7 +49,8 @@ export function Admin() {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    clearAdminSession();
+    setSession(false);
     setEmail(''); setPassword('');
   };
 
@@ -83,7 +74,7 @@ export function Admin() {
             </span>
             <h1 className="font-heading text-2xl font-bold text-daun-600">{dict.admin.title}</h1>
             <p className="mt-1 font-body text-sm text-daun-500">
-              {mode === 'login' ? dict.admin.login : dict.admin.login}
+              {dict.admin.login}
             </p>
           </div>
 
@@ -121,20 +112,9 @@ export function Admin() {
 
             <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60">
               {busy ? <Loader2 size={18} className="animate-spin" /> : null}
-              {mode === 'login' ? dict.admin.login : dict.admin.login}
+              {dict.admin.login}
             </button>
           </form>
-
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => { setMode((m) => (m === 'login' ? 'signup' : 'login')); setAuthError(null); }}
-              className="font-body text-sm text-daun-600 transition hover:text-oranye-500"
-            >
-              {mode === 'login'
-                ? (lang === 'id' ? 'Belum punya akun? Daftar di sini' : 'No account? Sign up here')
-                : (lang === 'id' ? 'Sudah punya akun? Masuk' : 'Already have an account? Sign in')}
-            </button>
-          </div>
 
           <button onClick={goHome} className="mt-6 flex w-full items-center justify-center gap-2 font-body text-sm text-daun-500 transition hover:text-daun-700">
             <ArrowLeft size={16} /> {dict.admin.back}

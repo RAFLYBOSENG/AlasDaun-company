@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { CalendarCheck, CheckCircle2, Send, ArrowLeft, User, Phone, Calendar, Clock, Users, MapPin, StickyNote } from 'lucide-react';
 import { useLang } from '../lib/LanguageContext';
-import { insertReservation, buildWhatsAppMessage, openWhatsApp, type Reservation } from '../lib/supabase';
-import { restaurantInfo } from '../data/content';
+import { insertReservation, buildWhatsAppMessage, openWhatsApp, type Reservation } from '../lib/api';
 import { getOpenHoursText } from '../lib/hours';
 
 type Step = 'form' | 'summary' | 'success';

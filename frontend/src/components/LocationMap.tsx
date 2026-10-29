@@ -14,7 +14,7 @@ export function LocationMap() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-10 text-center">
           <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{dict.location.title}</p>
-          <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{dict.location.subtitle}</h2>
+          <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{dict.location.title}</h2>
           <div className="mx-auto h-1 w-20 rounded-full bg-oranye-500" />
         </div>
 
