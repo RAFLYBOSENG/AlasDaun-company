@@ -5,40 +5,30 @@ export default {
     extend: {
       colors: {
         daun: {
-          50: '#EEF6EF',
-          100: '#D6E8D8',
-          200: '#A8CCA9',
-          300: '#79B07B',
-          400: '#4F9452',
-          500: '#2F5D3A', // hijau daun pisang
-          600: '#264A30',
-          700: '#1D3826',
-          800: '#15281B',
-          900: '#0E1B11',
+          50: '#F1F5EC',
+          100: '#E1E9D7',
+          200: '#C6D6B2',
+          300: '#A8C187',
+          400: '#86A760', // hijau muda khas Alas Daun
+          500: '#1E3E2B', // hijau tua khas Alas Daun
+          600: '#193523',
+          700: '#152D20',
+          800: '#11251A',
+          900: '#0D1D14',
         },
         krem: {
-          50: '#FBF9F3',
-          100: '#F6EFE2', // krem
-          200: '#EDE2C8',
-          300: '#E3D2A8',
-          400: '#D4B97E',
-        },
-        tanah: {
-          50: '#F5EFE9',
-          100: '#E8D9CB',
-          200: '#C9A384',
-          300: '#A5764F',
-          400: '#82573A',
-          500: '#6B4A2F', // cokelat tanah
-          600: '#563B26',
-          700: '#412C1C',
+          50: '#FDF8EC', // putih gading
+          100: '#F8F1E3',
+          200: '#EEE5D2',
+          300: '#E3D7BD',
+          400: '#D5C7A7',
         },
         oranye: {
-          300: '#F0A85C',
-          400: '#E8923F',
-          500: '#D9822B', // aksen oranye hangat
-          600: '#B66A20',
-          700: '#8F521A',
+          300: '#F3A16F',
+          400: '#EB8345',
+          500: '#E06B22', // oranye khas Alas Daun
+          600: '#BF5418',
+          700: '#984114',
         },
       },
       fontFamily: {
@@ -48,8 +38,6 @@ export default {
       animation: {
         'fade-in': 'fadeIn 0.7s ease-out forwards',
         'fade-up': 'fadeUp 0.7s ease-out forwards',
-        'float': 'float 6s ease-in-out infinite',
-        'shimmer': 'shimmer 2.5s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -60,18 +48,10 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(28px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
       },
       boxShadow: {
-        'soft': '0 10px 40px -10px rgba(47, 93, 58, 0.15)',
-        'card': '0 8px 30px -6px rgba(107, 74, 47, 0.18)',
+        'soft': '0 10px 40px -10px rgba(30, 62, 43, 0.15)',
+        'card': '0 8px 30px -6px rgba(30, 62, 43, 0.18)',
       },
     },
   },

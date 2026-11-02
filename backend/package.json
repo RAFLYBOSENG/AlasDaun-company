@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "admin:create": "node scripts/create-admin.js",
+    "menu:seed": "node scripts/seed-menu.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
