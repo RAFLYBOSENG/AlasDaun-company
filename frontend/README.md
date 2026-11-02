@@ -26,3 +26,20 @@ Sebelum menjalankan perintah tersebut, salin `backend/.env.example` ke
 `ADMIN_PASSWORD`, lalu jalankan schema Neon. Buka `/` untuk melihat menu dari
 database dan `/#/admin` untuk login serta mengelolanya. Panduan database lengkap tersedia di
 [`../backend/neon/README.md`](../backend/neon/README.md).
+
+## Deploy ke Vercel
+
+Import repository ini ke Vercel tanpa mengubah Root Directory. Konfigurasi
+[`../vercel.json`](../vercel.json) akan membangun `frontend/dist` dan
+mengarahkan `/api/*` ke function serverless.
+
+Tambahkan environment variables berikut di pengaturan project Vercel:
+
+- `DATABASE_URL`
+- `SESSION_SECRET` (minimal 32 karakter)
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+
+Jalankan schema Neon dan buat admin sebelum memakai halaman admin. Upload
+gambar di Vercel disimpan sebagai data URL di database karena filesystem
+serverless tidak persisten.

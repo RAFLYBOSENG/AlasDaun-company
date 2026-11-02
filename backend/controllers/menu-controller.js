@@ -61,7 +61,8 @@ function validateMenuItem(body) {
   if (!descriptionId || descriptionId.length > 1000) return 'Deskripsi Bahasa Indonesia wajib diisi (maksimal 1000 karakter).';
   if (!descriptionEn || descriptionEn.length > 1000) return 'Deskripsi Bahasa Inggris wajib diisi (maksimal 1000 karakter).';
   const isUploadedImage = /^\/asset\/images\/menu\/[0-9a-f-]+\.(?:jpg|png|webp|gif)$/i.test(image);
-  if (!isUploadedImage) {
+  const isStoredVercelImage = /^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/i.test(image);
+  if (!isUploadedImage && !isStoredVercelImage) {
     try {
       const imageUrl = new URL(image);
       if (!['http:', 'https:'].includes(imageUrl.protocol)) throw new Error('invalid protocol');
@@ -121,6 +122,12 @@ export async function uploadMenuImage(request, body) {
   const imageData = Buffer.from(body.data, 'base64');
   if (imageData.length === 0 || imageData.length > MAX_MENU_IMAGE_BYTES || !imageType.matches(imageData)) {
     return response(400, { error: 'Isi file tidak cocok dengan format gambar atau ukurannya melebihi 3 MB.' });
+  }
+
+  if (process.env.VERCEL) {
+    return response(201, {
+      data: { image: `data:${contentType};base64,${body.data}` },
+    });
   }
 
   await mkdir(MENU_IMAGE_DIRECTORY, { recursive: true });

@@ -9,4 +9,5 @@ ALTER TABLE menu_items
     CHECK (
       image_url ~ '^https?://'
       OR image_url ~ '^/asset/images/menu/[0-9a-f-]+\.(jpg|png|webp|gif)$'
+      OR image_url ~ '^data:image/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$'
     );

@@ -63,8 +63,9 @@ di `frontend/public/asset/images/menu`. Jika database menu sudah dibuat sebelum
 dukungan ini ditambahkan, jalankan [`menu-image-path-migration.sql`](./menu-image-path-migration.sql)
 di Neon agar kolom `image_url` menerima path foto lokal.
 
-Foto yang diunggah disimpan di `frontend/public/asset/images/menu`; pastikan
-folder tersebut tetap tersedia saat memindahkan atau mencadangkan proyek.
+Foto yang diunggah disimpan di `frontend/public/asset/images/menu` saat
+berjalan lokal. Di Vercel, gambar disimpan sebagai data URL di database karena
+filesystem serverless tidak persisten.
 
 ## Tes koneksi
 
