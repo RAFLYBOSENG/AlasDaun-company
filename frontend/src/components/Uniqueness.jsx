@@ -19,7 +19,7 @@ export function Uniqueness() {
         },
         {
             icon: Users,
-            titleId: 'Cocok untuk Keluarga & Rombongan',
+            titleId: 'Cicik intik Keluarga & Rombongan',
             titleEn: 'Great for Families & Groups',
             descId: 'Meja panjang beralas daun pisang mengundang semua orang untuk duduk bersama. Ideal untuk pertemuan keluarga, acara kantor, atau rombongan hingga puluhan orang.',
             descEn: 'Long banana-leaf tables invite everyone to sit together. Ideal for family gatherings, office events, or groups of dozens.',
