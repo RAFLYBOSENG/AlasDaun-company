@@ -56,9 +56,16 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- n8n Chat widget — inisialisasi setelah DOM siap -->
+    <!-- n8n Chat widget — tidak ditampilkan pada halaman admin -->
     <script type="module">
       import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+      const adminRoutePattern = /^\/admin(?:\/|$)|^#\/?admin(?:$|\/)/;
+
+      function isAdminRoute() {
+        return adminRoutePattern.test(window.location.pathname) ||
+          adminRoutePattern.test(window.location.hash);
+      }
 
       function initChat() {
         createChat({
@@ -69,11 +76,23 @@
         });
       }
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initChat);
-      } else {
-        initChat();
+      function syncChatVisibility() {
+        if (!isAdminRoute()) {
+          if (!document.querySelector('n8n-chat')) initChat();
+          return;
+        }
+
+        document.querySelector('n8n-chat')?.remove();
       }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncChatVisibility);
+      } else {
+        syncChatVisibility();
+      }
+
+      window.addEventListener('popstate', syncChatVisibility);
+      window.addEventListener('hashchange', syncChatVisibility);
     </script>
   </body>
 </html>
