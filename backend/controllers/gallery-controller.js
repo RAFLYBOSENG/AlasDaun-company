@@ -2,6 +2,7 @@ import { getPool } from '../database.js';
 import { isAdminRequest } from './auth-controller.js';
 
 const MAX_MEDIA_BYTES = 3 * 1024 * 1024;
+const GALLERY_CATEGORIES = ['moments', 'place', 'facilities'];
 const MEDIA_TYPES = {
   'image/jpeg': { type: 'image', matches: (data) => data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff },
   'image/png': { type: 'image', matches: (data) => data.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) },
@@ -19,6 +20,7 @@ function response(status, body) {
 function normalize(row) {
   return {
     id: row.id,
+    category: row.category,
     type: row.mediaType,
     src: row.mediaUrl,
     alt: row.altText,
@@ -27,7 +29,7 @@ function normalize(row) {
   };
 }
 
-const fields = `id, media_type AS "mediaType", media_url AS "mediaUrl",
+const fields = `id, category, media_type AS "mediaType", media_url AS "mediaUrl",
   alt_text AS "altText", sort_order AS "sortOrder", is_active AS "isActive"`;
 
 function validId(id) {
@@ -37,16 +39,18 @@ function validId(id) {
 function validate(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return 'Data galeri tidak valid.';
   const type = body.type === 'video' ? 'video' : body.type === 'image' ? 'image' : '';
+  const category = GALLERY_CATEGORIES.includes(body.category) ? body.category : '';
   const src = typeof body.src === 'string' ? body.src.trim() : '';
   const alt = typeof body.alt === 'string' ? body.alt.trim() : '';
   const sortOrder = body.sortOrder === '' || body.sortOrder === undefined ? 0 : Number(body.sortOrder);
   if (!type) return 'Jenis media harus berupa foto atau video.';
+  if (!category) return 'Kategori galeri tidak valid.';
   if (!src || (!src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:'))) {
     return 'Sumber media harus berupa URL http/https atau file yang diunggah.';
   }
   if (!alt || alt.length > 160) return 'Deskripsi galeri wajib diisi (maksimal 160 karakter).';
   if (!Number.isSafeInteger(sortOrder) || sortOrder < 0) return 'Urutan harus berupa bilangan bulat 0 atau lebih.';
-  return { type, src, alt, sortOrder, isActive: body.isActive !== false };
+  return { category, type, src, alt, sortOrder, isActive: body.isActive !== false };
 }
 
 export async function listGallery() {
@@ -90,9 +94,9 @@ export async function createGallery(request, body) {
   const item = validate(body);
   if (typeof item === 'string') return response(400, { error: item });
   const result = await getPool().query(
-    `INSERT INTO public.gallery_items (media_type, media_url, alt_text, sort_order, is_active)
-     VALUES ($1, $2, $3, $4, $5) RETURNING ${fields}`,
-    [item.type, item.src, item.alt, item.sortOrder, item.isActive],
+    `INSERT INTO public.gallery_items (category, media_type, media_url, alt_text, sort_order, is_active)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING ${fields}`,
+    [item.category, item.type, item.src, item.alt, item.sortOrder, item.isActive],
   );
   return response(201, { data: normalize(result.rows[0]) });
 }
@@ -103,10 +107,10 @@ export async function updateGallery(request, body, id) {
   const item = validate(body);
   if (typeof item === 'string') return response(400, { error: item });
   const result = await getPool().query(
-    `UPDATE public.gallery_items SET media_type = $2, media_url = $3,
-      alt_text = $4, sort_order = $5, is_active = $6
+    `UPDATE public.gallery_items SET category = $2, media_type = $3, media_url = $4,
+      alt_text = $5, sort_order = $6, is_active = $7
      WHERE id = $1 RETURNING ${fields}`,
-    [id, item.type, item.src, item.alt, item.sortOrder, item.isActive],
+    [id, item.category, item.type, item.src, item.alt, item.sortOrder, item.isActive],
   );
   if (!result.rows[0]) return response(404, { error: 'Media galeri tidak ditemukan.' });
   return response(200, { data: normalize(result.rows[0]) });

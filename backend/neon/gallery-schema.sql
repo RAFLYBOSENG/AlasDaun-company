@@ -3,6 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS gallery_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  category text NOT NULL DEFAULT 'moments' CHECK (category IN ('moments', 'place', 'facilities')),
   media_type text NOT NULL CHECK (media_type IN ('image', 'video')),
   media_url text NOT NULL CHECK (
     media_url ~ '^https?://'
