@@ -29,7 +29,7 @@ function normalizeMenuItem(row) {
     descriptionId: row.descriptionId,
     descriptionEn: row.descriptionEn,
     image: row.image,
-    isBestSeller: row.isBestSeller,
+    isRecommended: row.isRecommended,
     isNew: row.isNew,
     promo: row.promo,
     sortOrder: row.sortOrder,
@@ -38,7 +38,7 @@ function normalizeMenuItem(row) {
 
 const menuFields = `id, name, category, price, description_id AS "descriptionId",
   description_en AS "descriptionEn", image_url AS image,
-  is_best_seller AS "isBestSeller", is_new AS "isNew", promo,
+  is_recommended AS "isRecommended", is_new AS "isNew", promo,
   sort_order AS "sortOrder"`;
 
 function validateMenuItem(body) {
@@ -73,8 +73,8 @@ function validateMenuItem(body) {
   if (promo !== null && (!Number.isInteger(promo) || promo < 1 || promo > 99)) {
     return 'Promo harus berupa persentase bilangan bulat dari 1 sampai 99.';
   }
-  if (typeof body.isBestSeller !== 'boolean' || typeof body.isNew !== 'boolean') {
-    return 'Status best seller dan menu baru harus berupa boolean.';
+  if (typeof body.isRecommended !== 'boolean' || typeof body.isNew !== 'boolean') {
+    return 'Status recommended dan menu baru harus berupa boolean.';
   }
   if (body.isActive !== undefined && typeof body.isActive !== 'boolean') {
     return 'Status tampil harus berupa boolean.';
@@ -91,7 +91,7 @@ function validateMenuItem(body) {
     descriptionId,
     descriptionEn,
     image,
-    isBestSeller: body.isBestSeller,
+    isRecommended: body.isRecommended,
     isNew: body.isNew,
     promo,
     sortOrder,
@@ -155,11 +155,11 @@ export async function createMenu(request, body) {
   const result = await getPool().query(
     `INSERT INTO public.menu_items
       (name, category, price, description_id, description_en, image_url,
-       is_best_seller, is_new, promo, sort_order)
+       is_recommended, is_new, promo, sort_order)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING ${menuFields}`,
     [item.name, item.category, item.price, item.descriptionId, item.descriptionEn,
-      item.image, item.isBestSeller, item.isNew, item.promo, item.sortOrder],
+      item.image, item.isRecommended, item.isNew, item.promo, item.sortOrder],
   );
   return response(201, { data: normalizeMenuItem(result.rows[0]) });
 }
@@ -174,12 +174,12 @@ export async function updateMenu(request, body, id) {
   const result = await getPool().query(
     `UPDATE public.menu_items SET
        name = $2, category = $3, price = $4, description_id = $5,
-       description_en = $6, image_url = $7, is_best_seller = $8,
+       description_en = $6, image_url = $7, is_recommended = $8,
        is_new = $9, promo = $10, sort_order = $11, is_active = $12
      WHERE id = $1
      RETURNING ${menuFields}, is_active AS "isActive"`,
     [id, item.name, item.category, item.price, item.descriptionId,
-      item.descriptionEn, item.image, item.isBestSeller, item.isNew,
+      item.descriptionEn, item.image, item.isRecommended, item.isNew,
       item.promo, item.sortOrder, body.isActive !== false],
   );
   if (!result.rows[0]) return response(404, { error: 'Menu tidak ditemukan.' });

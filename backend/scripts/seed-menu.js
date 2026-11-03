@@ -25,7 +25,7 @@ try {
     await client.query(
       `INSERT INTO public.menu_items
         (name, category, price, description_id, description_en, image_url,
-         is_best_seller, is_new, promo, sort_order)
+         is_recommended, is_new, promo, sort_order)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         item.name,
@@ -34,7 +34,7 @@ try {
         item.descriptionId,
         item.descriptionEn,
         item.image,
-        item.badge === 'Best Seller',
+        item.badge === 'Recommended',
         item.badge === 'Menu Baru',
         item.promo ?? null,
         index,
