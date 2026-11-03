@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pencil, Plus, Trash2, X } from 'lucide-react';
 import { apiRequest } from '../lib/api';
 
@@ -28,6 +28,7 @@ export function GalleryAdmin({ onError, onNotice }) {
   const [previewUrl, setPreviewUrl] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const closeButtonRef = useRef(null);
 
   async function loadItems() {
     const result = await apiRequest('/api/admin/gallery');
@@ -41,6 +42,23 @@ export function GalleryAdmin({ onError, onNotice }) {
   useEffect(() => () => {
     if (previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
+
+  useEffect(() => {
+    if (!showForm) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && !saving) closeForm();
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+    closeButtonRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showForm, saving]);
 
   function startCreate() {
     setEditingId(null);
@@ -147,38 +165,55 @@ export function GalleryAdmin({ onError, onNotice }) {
       </div>
 
       {showForm && (
-        <form onSubmit={save} className="mb-8 rounded-2xl border border-daun-100 bg-white p-5 shadow-soft sm:p-7">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="font-heading text-xl font-bold text-daun-700">{editingId ? 'Ubah media' : 'Tambah media'}</h2>
-            <button type="button" onClick={closeForm} aria-label="Tutup form" className="rounded-full p-2 text-daun-500 hover:bg-daun-50"><X size={20} /></button>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="text-sm font-medium text-daun-700">
-              Kategori galeri
-              <select name="category" value={form.category} onChange={updateField} className={inputClass}>
-                <option value="moments">Momen di Alas Daun</option>
-                <option value="place">Tempat & Restoran</option>
-                <option value="facilities">Fasilitas</option>
-              </select>
-            </label>
-            <label className="text-sm font-medium text-daun-700">
-              Foto atau video
-              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg" onChange={selectFile} className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-daun-50 file:px-4 file:py-2 file:font-medium file:text-daun-700`} />
-              <span className="mt-1 block text-xs font-normal text-daun-500">Maksimal 3 MB. Video sebaiknya MP4/WebM.</span>
-            </label>
-            <label className="text-sm font-medium text-daun-700">
-              Deskripsi media
-              <input name="alt" value={form.alt} onChange={updateField} required maxLength={160} placeholder="Contoh: Suasana makan keluarga" className={inputClass} />
-            </label>
-            <label className="text-sm font-medium text-daun-700">
-              Urutan tampil
-              <input name="sortOrder" type="number" min="0" step="1" value={form.sortOrder} onChange={updateField} className={inputClass} />
-            </label>
-            {editingId && <label className="flex items-center gap-2 self-end pb-3 text-sm font-medium text-daun-700"><input name="isActive" type="checkbox" checked={form.isActive} onChange={updateField} className="h-4 w-4 accent-daun-500" /> Tampilkan di website</label>}
-          </div>
-          {previewUrl && (form.type === 'video' ? <video src={previewUrl} controls className="mt-4 h-40 w-64 rounded-xl border border-daun-100 object-cover" /> : <img src={previewUrl} alt="Pratinjau galeri" className="mt-4 h-40 w-64 rounded-xl border border-daun-100 object-cover" />)}
-          <button type="submit" disabled={saving} className="btn-primary mt-5 disabled:opacity-60">{saving ? 'Menyimpan...' : 'Simpan media'}</button>
-        </form>
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-daun-900/50 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !saving) closeForm();
+          }}
+        >
+          <form
+            onSubmit={save}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gallery-form-title"
+            className="max-h-[calc(100vh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-daun-100 bg-white p-5 shadow-2xl sm:p-7"
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <h2 id="gallery-form-title" className="font-heading text-xl font-bold text-daun-700">{editingId ? 'Ubah media' : 'Tambah media'}</h2>
+              <button ref={closeButtonRef} type="button" onClick={closeForm} aria-label="Tutup form" className="rounded-full p-2 text-daun-500 hover:bg-daun-50"><X size={20} /></button>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="text-sm font-medium text-daun-700">
+                Kategori galeri
+                <select name="category" value={form.category} onChange={updateField} className={inputClass}>
+                  <option value="moments">Momen di Alas Daun</option>
+                  <option value="place">Tempat & Restoran</option>
+                  <option value="facilities">Fasilitas</option>
+                </select>
+              </label>
+              <label className="text-sm font-medium text-daun-700">
+                Foto atau video
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg" onChange={selectFile} className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-daun-50 file:px-4 file:py-2 file:font-medium file:text-daun-700`} />
+                <span className="mt-1 block text-xs font-normal text-daun-500">Maksimal 3 MB. Video sebaiknya MP4/WebM.</span>
+              </label>
+              <label className="text-sm font-medium text-daun-700">
+                Deskripsi media
+                <input name="alt" value={form.alt} onChange={updateField} required maxLength={160} placeholder="Contoh: Suasana makan keluarga" className={inputClass} />
+              </label>
+              <label className="text-sm font-medium text-daun-700">
+                Urutan tampil
+                <input name="sortOrder" type="number" min="0" step="1" value={form.sortOrder} onChange={updateField} className={inputClass} />
+              </label>
+              {editingId && <label className="flex items-center gap-2 self-end pb-3 text-sm font-medium text-daun-700"><input name="isActive" type="checkbox" checked={form.isActive} onChange={updateField} className="h-4 w-4 accent-daun-500" /> Tampilkan di website</label>}
+            </div>
+            {previewUrl && (form.type === 'video' ? <video src={previewUrl} controls className="mt-4 h-40 w-64 rounded-xl border border-daun-100 object-cover" /> : <img src={previewUrl} alt="Pratinjau galeri" className="mt-4 h-40 w-64 rounded-xl border border-daun-100 object-cover" />)}
+            <div className="mt-5 flex flex-wrap justify-end gap-3">
+              <button type="button" onClick={closeForm} disabled={saving} className="btn-outline disabled:opacity-60">Batal</button>
+              <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">{saving ? 'Menyimpan...' : 'Simpan media'}</button>
+            </div>
+          </form>
+        </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
