@@ -45,9 +45,6 @@ export function Navbar() {
           <button onClick={toggle} className={`ml-2 rounded-full px-3 py-1.5 font-body text-xs font-semibold transition ${scrolled ? 'border border-daun-300 text-daun-600 hover:bg-daun-100' : 'border border-daun-300 text-daun-600 hover:bg-daun-100 lg:border-krem-100/20 lg:text-krem-50 lg:hover:border-oranye-400 lg:hover:bg-oranye-500'} ${floatingControl}`} aria-label="Toggle language">
             {lang === 'id' ? 'EN' : 'ID'}
           </button>
-          <a href="/admin" className="ml-2 rounded-full bg-oranye-500 px-4 py-2 font-body text-sm font-semibold text-white transition hover:bg-oranye-600">
-            Admin
-          </a>
         </div>
 
         {/* Mobile toggle */}
@@ -63,9 +60,6 @@ export function Navbar() {
                 {l.label}
               </button>))}
             <div className="flex items-center gap-3 px-4 pt-2">
-              <a href="/admin" onClick={() => setOpen(false)} className="rounded-full border border-oranye-500 px-4 py-1.5 font-body text-xs font-semibold text-oranye-600 transition hover:bg-oranye-500 hover:text-white">
-                Admin
-              </a>
               <button onClick={toggle} className="rounded-full border border-daun-300 px-4 py-1.5 font-body text-xs font-semibold text-daun-600">
                 {lang === 'id' ? 'English' : 'Bahasa Indonesia'}
               </button>
