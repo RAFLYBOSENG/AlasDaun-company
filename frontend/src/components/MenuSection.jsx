@@ -11,6 +11,8 @@ export function MenuSection() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showAll, setShowAll] = useState(false);
+    const [showFeatured, setShowFeatured] = useState(false);
+    const [showPackages, setShowPackages] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState(null);
     useEffect(() => {
         let cancelled = false;
@@ -32,20 +34,25 @@ export function MenuSection() {
         const label = categoryLabels[category];
         return label ? (lang === 'id' ? label.id : label.en) : category.replaceAll('-', ' ');
     };
-    const categories = [...new Set(menuItems.map((item) => item.category))];
+    const categories = [...new Set(menuItems.map((item) => item.category))].filter((category) => category !== 'paket-makanan');
     const featuredItems = menuItems.filter((item) => item.isRecommended || item.promo);
+    const packageItems = menuItems.filter((item) => item.category === 'paket-makanan');
+    const regularItems = menuItems.filter((item) => item.category !== 'paket-makanan' && !item.isRecommended && !item.promo);
     const filteredAll = useMemo(() => (
         menuItems.filter((item) => {
+            if (item.category === 'paket-makanan') return false;
             if (active === 'recommended') return item.isRecommended || item.promo;
             return active === 'all' || item.category === active;
         })
     ), [active, menuItems]);
     useEffect(() => {
-        if (!selectedMenu && !showAll) return undefined;
+        if (!selectedMenu && !showAll && !showFeatured && !showPackages) return undefined;
         const previousOverflow = document.body.style.overflow;
         const closeOnEscape = (event) => {
             if (event.key === 'Escape') {
                 if (selectedMenu) setSelectedMenu(null);
+                else if (showFeatured) setShowFeatured(false);
+                else if (showPackages) setShowPackages(false);
                 else setShowAll(false);
             }
         };
@@ -55,8 +62,8 @@ export function MenuSection() {
             document.body.style.overflow = previousOverflow;
             window.removeEventListener('keydown', closeOnEscape);
         };
-    }, [selectedMenu, showAll]);
-    const displayedItems = menuItems.filter((item) => !item.isRecommended && !item.promo).slice(0, 4);
+    }, [selectedMenu, showAll, showFeatured, showPackages]);
+    const displayedItems = regularItems.slice(0, 4);
     const formatPrice = (price) => `Rp ${price.toLocaleString('id-ID')}`;
 
     const renderMenuCard = (m, inGrid = false) => {
@@ -73,12 +80,26 @@ export function MenuSection() {
               <img src={m.image} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none"/>
               <div className="absolute inset-0 bg-gradient-to-t from-daun-900/50 via-transparent to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100"/>
               {(m.isRecommended || m.isNew) && (
-                <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 font-body text-xs font-semibold shadow-soft ${m.isRecommended ? 'bg-oranye-500 text-white' : 'bg-daun-500 text-krem-100'}`}>
-                  {m.isRecommended && <Star size={12} fill="currentColor"/>}
-                  {m.isRecommended ? dict.menu.recommended : dict.menu.baru}
-                </span>
+                <div className="absolute left-3 top-3 flex max-w-[calc(100%-24px)] flex-wrap gap-1.5">
+                  {m.isRecommended && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-oranye-500 px-3 py-1 font-body text-xs font-semibold text-white shadow-soft">
+                      <Star size={12} fill="currentColor"/>
+                      {dict.menu.recommended}
+                    </span>
+                  )}
+                  {m.isNew && (
+                    <span className="inline-flex rounded-full bg-daun-500 px-3 py-1 font-body text-xs font-semibold text-krem-100 shadow-soft">
+                      {dict.menu.baru}
+                    </span>
+                  )}
+                </div>
               )}
-            </div>
+                  {m.promo && (
+                    <span className="absolute right-3 top-3 rounded-lg border border-white/80 bg-red-600 px-2.5 py-1.5 font-body text-xs font-bold text-white shadow-[0_4px_12px_rgba(127,29,29,0.35)]">
+                      {lang === 'id' ? 'PROMO' : 'PROMO'} -{m.promo}%
+                    </span>
+                  )}
+                </div>
             <div className="flex min-h-32 flex-1 flex-col p-4">
               <h3 className="mb-1.5 font-heading text-base font-bold text-daun-700 transition-colors duration-300 group-hover:text-oranye-600">{m.name}</h3>
               <span className="mb-3 font-body text-xs font-medium text-daun-500">
@@ -97,8 +118,8 @@ export function MenuSection() {
                   </span>
                 </div>
                 {m.promo && (
-                  <span className="rounded-md bg-oranye-500 px-2 py-1 font-body text-xs font-bold text-white shadow-soft">
-                    -{m.promo}%
+                  <span className="text-right font-body text-xs font-bold text-red-600">
+                    Hemat {m.promo}%
                   </span>
                 )}
               </div>
@@ -116,18 +137,53 @@ export function MenuSection() {
         </div>
 
         {!loading && !error && featuredItems.length > 0 && (
-          <div className="mb-12">
-            <div className="mb-5 flex items-center justify-center gap-2">
-              <Star size={18} fill="currentColor" className="text-oranye-500"/>
-              <h3 className="font-heading text-2xl font-bold text-daun-700">
+          <div className="mb-14 rounded-3xl border border-oranye-100 bg-white/60 p-4 shadow-soft sm:p-6">
+            <div className="mb-5 flex items-center gap-3 border-b border-daun-100 pb-4">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-oranye-500 text-white shadow-soft">
+                <Star size={18} fill="currentColor"/>
+              </span>
+              <h3 className="font-heading text-2xl font-bold text-daun-700 sm:text-3xl">
                 {dict.menu.recommended}
               </h3>
             </div>
             <div
               aria-label={dict.menu.recommended}
-              className="menu-horizontal-scroll flex snap-x snap-mandatory touch-pan-x gap-4 overflow-x-auto px-1 pb-4"
+              className="menu-horizontal-scroll flex snap-x snap-mandatory touch-pan-x gap-4 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4"
             >
-              {featuredItems.map((item) => renderMenuCard(item))}
+              {featuredItems.slice(0, 4).map((item) => renderMenuCard(item, true))}
+            </div>
+            <div className="mt-5 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowFeatured(true)}
+                className="group btn-accent px-7 py-3.5 text-sm font-semibold shadow-lg transition-transform hover:-translate-y-0.5 sm:text-base"
+              >
+                {lang === 'id' ? 'Lihat Recommended dan Promo' : 'View Recommended and Promo'}
+                <ArrowRight size={18} aria-hidden="true" className="ml-2 inline-block transition-transform group-hover:translate-x-1"/>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && packageItems.length > 0 && (
+          <div className="mb-14 rounded-3xl border border-daun-100 bg-white/60 p-4 shadow-soft sm:p-6">
+            <div className="mb-5 flex items-end justify-between border-b border-daun-100 pb-4">
+              <h3 className="font-heading text-2xl font-bold text-daun-700 sm:text-3xl">
+                {lang === 'id' ? 'Paket Makanan' : 'Meal Packages'}
+              </h3>
+            </div>
+            <div className="menu-horizontal-scroll flex snap-x snap-mandatory touch-pan-x gap-4 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
+              {packageItems.slice(0, 4).map((item) => renderMenuCard(item, true))}
+            </div>
+            <div className="mt-5 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowPackages(true)}
+                className="group btn-accent px-7 py-3.5 text-sm font-semibold shadow-lg transition-transform hover:-translate-y-0.5 sm:text-base"
+              >
+                {lang === 'id' ? 'Lihat menu paket' : 'View meal packages'}
+                <ArrowRight size={18} aria-hidden="true" className="ml-2 inline-block transition-transform group-hover:translate-x-1"/>
+              </button>
             </div>
           </div>
         )}
@@ -135,9 +191,14 @@ export function MenuSection() {
         {/* Menu cards */}
         {error ? (<p role="alert" className="py-10 text-center font-body text-red-700">{error}</p>) : loading ? (
             <p className="py-10 text-center font-body text-daun-500">Memuat daftar menu...</p>
-        ) : menuItems.length === 0 ? (<p className="py-10 text-center font-body text-daun-500">Menu belum tersedia.</p>) : (<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="no-scrollbar col-span-full flex gap-4 overflow-x-auto px-1 pb-4">
-              {displayedItems.map((item) => renderMenuCard(item))}
+        ) : menuItems.length === 0 ? (<p className="py-10 text-center font-body text-daun-500">Menu belum tersedia.</p>) : (<div className="rounded-3xl border border-daun-100 bg-white/60 p-4 shadow-soft sm:p-6">
+            <div className="mb-5 flex items-end justify-between border-b border-daun-100 pb-4">
+              <h3 className="font-heading text-2xl font-bold text-daun-700 sm:text-3xl">
+                {lang === 'id' ? 'Menu Lainnya' : 'Other Menu'}
+              </h3>
+            </div>
+            <div className="no-scrollbar menu-horizontal-scroll col-span-full flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
+              {displayedItems.map((item) => renderMenuCard(item, true))}
             </div>
             <div className="col-span-full mt-5 flex justify-center">
               <button
@@ -152,6 +213,74 @@ export function MenuSection() {
           </div>)}
 
       </div>
+      {showPackages && createPortal(
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-daun-900/70 p-3 backdrop-blur-sm sm:p-6"
+          onClick={() => setShowPackages(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="package-menu-title"
+            className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-krem-50 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-daun-100 px-5 py-4 sm:px-7">
+              <h3 id="package-menu-title" className="font-heading text-xl font-bold text-daun-700 sm:text-2xl">
+                {lang === 'id' ? 'Paket Makanan' : 'Meal Packages'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowPackages(false)}
+                aria-label={lang === 'id' ? 'Tutup menu paket' : 'Close meal package menu'}
+                className="rounded-full p-2 text-daun-700 transition hover:bg-daun-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-daun-500"
+              >
+                <X size={20}/>
+              </button>
+            </div>
+            <div className="overflow-y-auto p-4 sm:p-7">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {packageItems.map((item) => renderMenuCard(item, true))}
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+      {showFeatured && createPortal(
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-daun-900/70 p-3 backdrop-blur-sm sm:p-6"
+          onClick={() => setShowFeatured(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="featured-menu-title"
+            className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-krem-50 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-daun-100 px-5 py-4 sm:px-7">
+              <h3 id="featured-menu-title" className="font-heading text-xl font-bold text-daun-700 sm:text-2xl">
+                {lang === 'id' ? 'Recommended dan Promo' : 'Recommended and Promo'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowFeatured(false)}
+                aria-label={lang === 'id' ? 'Tutup menu Recommended dan Promo' : 'Close Recommended and Promo menu'}
+                className="rounded-full p-2 text-daun-700 transition hover:bg-daun-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-daun-500"
+              >
+                <X size={20}/>
+              </button>
+            </div>
+            <div className="overflow-y-auto p-4 sm:p-7">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {featuredItems.map((item) => renderMenuCard(item, true))}
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
       {showAll && createPortal(
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-daun-900/70 p-3 backdrop-blur-sm sm:p-6"
