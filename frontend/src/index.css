@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --chat--color--primary: #E06B22;
+  --chat--color--primary-shade-50: #D9611D;
+  --chat--color--primary--shade-100: #BF5418;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
