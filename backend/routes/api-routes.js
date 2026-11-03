@@ -5,6 +5,14 @@ import {
 } from '../controllers/auth-controller.js';
 import { databaseHealth } from '../controllers/health-controller.js';
 import {
+  createGallery,
+  deleteGallery,
+  listAdminGallery,
+  listGallery,
+  updateGallery,
+  uploadGalleryMedia,
+} from '../controllers/gallery-controller.js';
+import {
   createMenu,
   deleteMenu,
   listAdminMenu,
@@ -19,6 +27,10 @@ const routes = [
   { method: 'GET', path: '/api/auth/session', handler: ({ request }) => getSession(request) },
   { method: 'GET', path: '/api/health/db', handler: () => databaseHealth() },
   { method: 'GET', path: '/api/menu', handler: () => listMenu() },
+  { method: 'GET', path: '/api/gallery', handler: () => listGallery() },
+  { method: 'POST', path: '/api/admin/gallery/media', handler: ({ request, body }) => uploadGalleryMedia(request, body) },
+  { method: 'GET', path: '/api/admin/gallery', handler: ({ request }) => listAdminGallery(request) },
+  { method: 'POST', path: '/api/admin/gallery', handler: ({ request, body }) => createGallery(request, body) },
   { method: 'POST', path: '/api/admin/menu/image', handler: ({ request, body }) => uploadMenuImage(request, body) },
   { method: 'GET', path: '/api/admin/menu', handler: ({ request }) => listAdminMenu(request) },
   { method: 'POST', path: '/api/admin/menu', handler: ({ request, body }) => createMenu(request, body) },
@@ -31,6 +43,16 @@ const routes = [
     method: 'DELETE',
     match: /^\/api\/admin\/menu\/([^/]+)$/,
     handler: ({ request, match }) => deleteMenu(request, match[1]),
+  },
+  {
+    method: 'PUT',
+    match: /^\/api\/admin\/gallery\/([^/]+)$/,
+    handler: ({ request, body, match }) => updateGallery(request, body, match[1]),
+  },
+  {
+    method: 'DELETE',
+    match: /^\/api\/admin\/gallery\/([^/]+)$/,
+    handler: ({ request, match }) => deleteGallery(request, match[1]),
   },
 ];
 

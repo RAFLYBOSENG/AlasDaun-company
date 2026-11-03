@@ -13,6 +13,8 @@
    ```
 
    [`schema.sql`](./schema.sql) menyediakan skema admin dan menu yang sama.
+   Setelah itu jalankan [`gallery-schema.sql`](./gallery-schema.sql) untuk
+   membuat tabel galeri dan mengimpor galeri awal.
 
 3. Simpan connection string sebagai `DATABASE_URL` hanya di backend:
 
@@ -66,6 +68,10 @@ di Neon agar kolom `image_url` menerima path foto lokal.
 Foto yang diunggah disimpan di `frontend/public/asset/images/menu` saat
 berjalan lokal. Di Vercel, gambar disimpan sebagai data URL di database karena
 filesystem serverless tidak persisten.
+
+Halaman admin juga menyediakan pengelolaan foto dan video galeri. Format yang
+didukung adalah JPEG, PNG, WebP, GIF, MP4, WebM, dan OGG dengan ukuran maksimal
+3 MB per file. Di Vercel, media galeri disimpan sebagai data URL di database.
 
 ## Tes koneksi
 

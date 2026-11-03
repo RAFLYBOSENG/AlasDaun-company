@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowDown, ArrowUp, ArrowUpDown, Leaf, LogOut, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { apiRequest } from '../lib/api';
+import { GalleryAdmin } from './GalleryAdmin';
 
 const emptyMenu = {
   name: '',
@@ -744,6 +745,9 @@ export function Admin() {
             )}
           </div>
         )}
+      </section>
+      <section className="mx-auto max-w-7xl px-5 pb-12">
+        <GalleryAdmin onError={setError} onNotice={setNotice} />
       </section>
     </main>
   );
