@@ -16,7 +16,7 @@ export const menuItems = [
         descriptionId: 'Ayam goreng berkuah santan kental, disajikan di atas daun pisang dengan nasi hangat dan sambal dadak.',
         descriptionEn: 'Fried chicken in rich coconut gravy, served on banana leaf with warm rice and fresh chili paste.',
         image: 'https://images.pexels.com/photos/36853606/pexels-photo-36853606.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
-        badge: 'Best Seller',
+        badge: 'Recommended',
     },
     {
         id: 'ayam-kecap',
@@ -35,7 +35,7 @@ export const menuItems = [
         descriptionId: 'Ayam kampung asli dengan tekstur padat dan rasa gurih, digoreng kering dan disajikan bersama lalapan.',
         descriptionEn: 'Authentic free-range chicken with firm texture and savory taste, fried and served with fresh greens.',
         image: 'https://images.pexels.com/photos/28041446/pexels-photo-28041446.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
-        badge: 'Best Seller',
+        badge: 'Recommended',
     },
     {
         id: 'bebek',
@@ -93,7 +93,7 @@ export const menuItems = [
         descriptionId: 'Gurame goreng kering, kulit renyah dan daging tebal manis, favorit keluarga sejak dulu.',
         descriptionEn: 'Crispy fried gurame, crunchy skin and sweet thick meat, a long-time family favorite.',
         image: 'https://images.pexels.com/photos/6872121/pexels-photo-6872121.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
-        badge: 'Best Seller',
+        badge: 'Recommended',
     },
     {
         id: 'baronang',

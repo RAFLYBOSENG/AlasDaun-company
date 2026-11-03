@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
   image_url text NOT NULL CONSTRAINT menu_items_image_url_check
     CHECK (image_url ~ '^https?://' OR image_url ~ '^/asset/images/menu/[0-9a-f-]+\.(jpg|png|webp|gif)$'
       OR image_url ~ '^data:image/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$'),
-  is_best_seller boolean NOT NULL DEFAULT false,
+  is_recommended boolean NOT NULL DEFAULT false,
   is_new boolean NOT NULL DEFAULT false,
   promo integer CHECK (promo IS NULL OR promo BETWEEN 1 AND 99),
   is_active boolean NOT NULL DEFAULT true,

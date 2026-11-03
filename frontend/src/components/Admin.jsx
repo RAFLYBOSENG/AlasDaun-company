@@ -10,7 +10,7 @@ const emptyMenu = {
   descriptionId: '',
   descriptionEn: '',
   image: '',
-  isBestSeller: false,
+  isRecommended: false,
   isNew: false,
   promo: '',
   sortOrder: 0,
@@ -49,6 +49,7 @@ function categorySlug(value) {
 export function Admin() {
   const [checkingSession, setCheckingSession] = useState(true);
   const [admin, setAdmin] = useState(null);
+  const [activeTab, setActiveTab] = useState('menu');
   const [items, setItems] = useState([]);
   const [form, setForm] = useState(emptyMenu);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -415,6 +416,29 @@ export function Admin() {
       </header>
 
       <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-5 sm:py-10">
+        <div className="mb-7 flex gap-2 rounded-xl bg-white p-1.5 shadow-soft" role="tablist" aria-label="Kelola website">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'menu'}
+            onClick={() => setActiveTab('menu')}
+            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition sm:flex-none sm:px-6 ${activeTab === 'menu' ? 'bg-daun-600 text-white' : 'text-daun-600 hover:bg-daun-50'}`}
+          >
+            Kelola Menu
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'gallery'}
+            onClick={() => setActiveTab('gallery')}
+            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition sm:flex-none sm:px-6 ${activeTab === 'gallery' ? 'bg-daun-600 text-white' : 'text-daun-600 hover:bg-daun-50'}`}
+          >
+            Kelola Galeri
+          </button>
+        </div>
+
+        {activeTab === 'menu' && (
+          <>
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-heading text-3xl font-bold text-daun-700">Daftar Menu</h1>
@@ -591,6 +615,10 @@ export function Admin() {
             </div>
             <div className="my-5 flex flex-wrap gap-5">
               <label className="flex items-center gap-2 text-sm text-daun-700">
+                <input name="isRecommended" type="checkbox" checked={form.isRecommended} onChange={updateField} className="h-4 w-4 accent-daun-500" />
+                Recommended
+              </label>
+              <label className="flex items-center gap-2 text-sm text-daun-700">
                 <input name="isNew" type="checkbox" checked={form.isNew} onChange={updateField} className="h-4 w-4 accent-daun-500" />
                 Menu baru
               </label>
@@ -643,14 +671,14 @@ export function Admin() {
                     <tr key={item.id}>
                       <td className="px-2 py-3 align-top sm:px-5 sm:py-4">
                         <div className="flex flex-col gap-2 overflow-hidden">
-                          <label className="flex items-center gap-2 text-xs text-daun-700" title="Best seller">
+                          <label className="flex items-center gap-2 text-xs text-daun-700" title="Recommended">
                             <input
                               type="checkbox"
-                              checked={Boolean(item.isBestSeller)}
-                              onChange={(event) => updateQuickSetting(item, { isBestSeller: event.target.checked })}
+                              checked={Boolean(item.isRecommended)}
+                              onChange={(event) => updateQuickSetting(item, { isRecommended: event.target.checked })}
                               className="h-4 w-4 accent-daun-500"
                             />
-                            Best seller
+                            Recommended
                           </label>
                           <label className="flex items-center gap-2 text-xs text-daun-700" title="Menu baru">
                             <input
@@ -686,7 +714,7 @@ export function Admin() {
                       </td>
                       <td className="px-2 py-3 align-top sm:px-5 sm:py-4">
                         <p className="font-semibold text-daun-800">{item.name}</p>
-                        <p className="mt-1 text-xs text-daun-500">{item.isBestSeller ? 'Best seller · ' : ''}{item.isNew ? 'Menu baru · ' : ''}{item.isActive ? 'Aktif' : 'Disembunyikan'}</p>
+                        <p className="mt-1 text-xs text-daun-500">{item.isRecommended ? 'Recommended · ' : ''}{item.isNew ? 'Menu baru · ' : ''}{item.isActive ? 'Aktif' : 'Disembunyikan'}</p>
                       </td>
                       <td className="px-2 py-3 align-top sm:px-5 sm:py-4">
                         {item.image ? (
@@ -745,9 +773,16 @@ export function Admin() {
             )}
           </div>
         )}
-      </section>
-      <section className="mx-auto max-w-7xl px-5 pb-12">
-        <GalleryAdmin onError={setError} onNotice={setNotice} />
+          </>
+        )}
+
+        {activeTab === 'gallery' && (
+          <>
+            {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+            {notice && <p role="status" className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{notice}</p>}
+            <GalleryAdmin onError={setError} onNotice={setNotice} />
+          </>
+        )}
       </section>
     </main>
   );

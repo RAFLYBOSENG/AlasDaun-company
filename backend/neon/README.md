@@ -30,8 +30,12 @@ ke Neon.
 
 Schema membuat tabel `admins` dan `menu_items`. Kategori disimpan sebagai slug
 di kolom `menu_items.category` (contoh `paket-makanan`), sedangkan penanda
-best seller disimpan pada kolom boolean `is_best_seller`. Jalankan schema
+menu Recommended disimpan pada kolom boolean `is_recommended`. Jalankan schema
 sebelum membuat admin atau mengisi menu.
+
+Untuk database yang sudah dibuat sebelumnya dengan kolom `is_best_seller`,
+jalankan juga `backend/neon/recommended-migration.sql` agar kolom diubah menjadi
+`is_recommended` tanpa kehilangan data.
 
 Salin `backend/.env.example` menjadi `backend/.env`, lalu isi connection string
 database, secret sesi acak minimal 32 karakter, serta kredensial admin awal:

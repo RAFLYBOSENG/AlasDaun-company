@@ -33,10 +33,10 @@ export function MenuSection() {
         return label ? (lang === 'id' ? label.id : label.en) : category.replaceAll('-', ' ');
     };
     const categories = [...new Set(menuItems.map((item) => item.category))];
-    const bestSellerItems = menuItems.filter((item) => item.isBestSeller);
+    const featuredItems = menuItems.filter((item) => item.isRecommended || item.promo);
     const filteredAll = useMemo(() => (
         menuItems.filter((item) => {
-            if (active === 'best-seller') return item.isBestSeller;
+            if (active === 'recommended') return item.isRecommended || item.promo;
             return active === 'all' || item.category === active;
         })
     ), [active, menuItems]);
@@ -56,7 +56,7 @@ export function MenuSection() {
             window.removeEventListener('keydown', closeOnEscape);
         };
     }, [selectedMenu, showAll]);
-    const displayedItems = menuItems.filter((item) => !item.isBestSeller).slice(0, 4);
+    const displayedItems = menuItems.filter((item) => !item.isRecommended && !item.promo).slice(0, 4);
     const formatPrice = (price) => `Rp ${price.toLocaleString('id-ID')}`;
 
     const renderMenuCard = (m, inGrid = false) => {
@@ -72,25 +72,23 @@ export function MenuSection() {
             <div className="relative h-36 w-full overflow-hidden">
               <img src={m.image} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none"/>
               <div className="absolute inset-0 bg-gradient-to-t from-daun-900/50 via-transparent to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100"/>
-              {(m.isBestSeller || m.isNew) && (
-                <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 font-body text-xs font-semibold shadow-soft ${m.isBestSeller ? 'bg-oranye-500 text-white' : 'bg-daun-500 text-krem-100'}`}>
-                  {m.isBestSeller && <Star size={12} fill="currentColor"/>}
-                  {m.isBestSeller ? dict.menu.bestSeller : dict.menu.baru}
-                </span>
-              )}
-              {m.promo && (
-                <span className="absolute right-3 top-3 rounded-full bg-oranye-500 px-3 py-1 font-body text-xs font-bold text-white shadow-soft">
-                  -{m.promo}%
+              {(m.isRecommended || m.isNew) && (
+                <span className={`absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-3 py-1 font-body text-xs font-semibold shadow-soft ${m.isRecommended ? 'bg-oranye-500 text-white' : 'bg-daun-500 text-krem-100'}`}>
+                  {m.isRecommended && <Star size={12} fill="currentColor"/>}
+                  {m.isRecommended ? dict.menu.recommended : dict.menu.baru}
                 </span>
               )}
             </div>
             <div className="flex min-h-32 flex-1 flex-col p-4">
               <h3 className="mb-1.5 font-heading text-base font-bold text-daun-700 transition-colors duration-300 group-hover:text-oranye-600">{m.name}</h3>
+              <span className="mb-3 font-body text-xs font-medium text-daun-500">
+                {categoryName(m.category)}
+              </span>
               <p className="mb-3 line-clamp-2 flex-1 font-body text-xs leading-relaxed text-daun-800/70">
                 {lang === 'id' ? m.descriptionId : m.descriptionEn}
               </p>
               <div className="flex items-end justify-between gap-2">
-                <div className="flex flex-col">
+                <div className="flex items-center gap-2">
                   {promoPrice && (
                     <span className="font-body text-xs text-daun-500 line-through">{formatPrice(m.price)}</span>
                   )}
@@ -98,9 +96,11 @@ export function MenuSection() {
                     {formatPrice(promoPrice || m.price)}
                   </span>
                 </div>
-                <span className="rounded-full bg-daun-50 px-2.5 py-1 font-body text-xs font-medium text-daun-500">
-                  {categoryName(m.category)}
-                </span>
+                {m.promo && (
+                  <span className="rounded-md bg-oranye-500 px-2 py-1 font-body text-xs font-bold text-white shadow-soft">
+                    -{m.promo}%
+                  </span>
+                )}
               </div>
             </div>
           </button>
@@ -115,19 +115,19 @@ export function MenuSection() {
           <div className="mx-auto h-1 w-20 rounded-full bg-oranye-500"/>
         </div>
 
-        {!loading && !error && bestSellerItems.length > 0 && (
+        {!loading && !error && featuredItems.length > 0 && (
           <div className="mb-12">
             <div className="mb-5 flex items-center justify-center gap-2">
               <Star size={18} fill="currentColor" className="text-oranye-500"/>
               <h3 className="font-heading text-2xl font-bold text-daun-700">
-                {dict.menu.bestSeller}
+                {dict.menu.recommended}
               </h3>
             </div>
             <div
-              aria-label={dict.menu.bestSeller}
+              aria-label={dict.menu.recommended}
               className="menu-horizontal-scroll flex snap-x snap-mandatory touch-pan-x gap-4 overflow-x-auto px-1 pb-4"
             >
-              {bestSellerItems.map((item) => renderMenuCard(item))}
+              {featuredItems.map((item) => renderMenuCard(item))}
             </div>
           </div>
         )}
@@ -179,15 +179,15 @@ export function MenuSection() {
             </div>
             <div className="overflow-y-auto p-4 sm:p-7">
               <div className="no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-2">
-                {bestSellerItems.length > 0 && (
+                {featuredItems.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setActive('best-seller')}
-                    aria-pressed={active === 'best-seller'}
-                    className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${active === 'best-seller' ? 'bg-oranye-500 text-white shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
+                    onClick={() => setActive('recommended')}
+                    aria-pressed={active === 'recommended'}
+                    className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${active === 'recommended' ? 'bg-oranye-500 text-white shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
                   >
                     <Star size={14} fill="currentColor"/>
-                    {dict.menu.bestSeller}
+                    {dict.menu.recommended}
                   </button>
                 )}
                 <button
