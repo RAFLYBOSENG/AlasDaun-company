@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowDown, ArrowUp, ArrowUpDown, Leaf, LogOut, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { apiRequest } from '../lib/api';
 import { GalleryAdmin } from './GalleryAdmin';
+import { TestimonialsAdmin } from './TestimonialsAdmin';
 
 const emptyMenu = {
   name: '',
@@ -435,6 +436,15 @@ export function Admin() {
           >
             Kelola Galeri
           </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'testimonials'}
+            onClick={() => setActiveTab('testimonials')}
+            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition sm:flex-none sm:px-6 ${activeTab === 'testimonials' ? 'bg-daun-600 text-white' : 'text-daun-600 hover:bg-daun-50'}`}
+          >
+            Kelola Ulasan
+          </button>
         </div>
 
         {activeTab === 'menu' && (
@@ -781,6 +791,13 @@ export function Admin() {
             {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
             {notice && <p role="status" className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{notice}</p>}
             <GalleryAdmin onError={setError} onNotice={setNotice} />
+          </>
+        )}
+        {activeTab === 'testimonials' && (
+          <>
+            {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+            {notice && <p role="status" className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{notice}</p>}
+            <TestimonialsAdmin onError={setError} onNotice={setNotice} />
           </>
         )}
       </section>

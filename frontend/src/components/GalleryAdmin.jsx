@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2, X } from 'lucide-react';
 import { apiRequest } from '../lib/api';
 
-const emptyItem = { type: 'image', src: '', alt: '', sortOrder: 0, isActive: true };
+const emptyItem = { category: 'moments', type: 'image', src: '', alt: '', sortOrder: 0, isActive: true };
 const inputClass = 'mt-1 w-full rounded-lg border border-daun-200 bg-white px-3 py-2.5 text-sm text-daun-800 outline-none focus:border-daun-500 focus:ring-2 focus:ring-daun-100';
 
 function readFileAsBase64(file) {
@@ -154,6 +154,14 @@ export function GalleryAdmin({ onError, onNotice }) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-medium text-daun-700">
+              Kategori galeri
+              <select name="category" value={form.category} onChange={updateField} className={inputClass}>
+                <option value="moments">Momen di Alas Daun</option>
+                <option value="place">Tempat & Restoran</option>
+                <option value="facilities">Fasilitas</option>
+              </select>
+            </label>
+            <label className="text-sm font-medium text-daun-700">
               Foto atau video
               <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg" onChange={selectFile} className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-daun-50 file:px-4 file:py-2 file:font-medium file:text-daun-700`} />
               <span className="mt-1 block text-xs font-normal text-daun-500">Maksimal 3 MB. Video sebaiknya MP4/WebM.</span>
@@ -179,7 +187,7 @@ export function GalleryAdmin({ onError, onNotice }) {
             {item.type === 'video' ? <video src={item.src} muted playsInline preload="metadata" className="h-40 w-full object-cover" /> : <img src={item.src} alt={item.alt} className="h-40 w-full object-cover" />}
             <div className="p-3">
               <p className="truncate text-sm font-medium text-daun-700">{item.alt}</p>
-              <p className="mt-1 text-xs text-daun-500">{item.type === 'video' ? 'Video' : 'Foto'} · urutan {item.sortOrder}</p>
+              <p className="mt-1 text-xs text-daun-500">{item.category === 'place' ? 'Tempat & Restoran' : item.category === 'facilities' ? 'Fasilitas' : 'Momen di Alas Daun'} · {item.type === 'video' ? 'Video' : 'Foto'} · urutan {item.sortOrder}</p>
               <div className="mt-3 flex gap-2">
                 <button onClick={() => startEdit(item)} className="inline-flex items-center gap-1 rounded-full border border-daun-200 px-3 py-1.5 text-xs font-medium text-daun-600 hover:bg-daun-50"><Pencil size={14} /> Ubah</button>
                 <button onClick={() => remove(item)} className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"><Trash2 size={14} /> Hapus</button>

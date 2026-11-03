@@ -20,6 +20,16 @@ import {
   updateMenu,
   uploadMenuImage,
 } from '../controllers/menu-controller.js';
+import {
+  createBlockedKeyword,
+  createTestimonial,
+  deleteBlockedKeyword,
+  deleteTestimonial,
+  listAdminTestimonials,
+  listBlockedKeywords,
+  listPublicTestimonials,
+  updateTestimonial,
+} from '../controllers/testimonial-controller.js';
 
 const routes = [
   { method: 'POST', path: '/api/auth/login', handler: ({ request, body }) => login(request, body) },
@@ -28,6 +38,11 @@ const routes = [
   { method: 'GET', path: '/api/health/db', handler: () => databaseHealth() },
   { method: 'GET', path: '/api/menu', handler: () => listMenu() },
   { method: 'GET', path: '/api/gallery', handler: () => listGallery() },
+  { method: 'GET', path: '/api/testimonials', handler: () => listPublicTestimonials() },
+  { method: 'POST', path: '/api/testimonials', handler: ({ body }) => createTestimonial(body) },
+  { method: 'GET', path: '/api/admin/testimonials', handler: ({ request }) => listAdminTestimonials(request) },
+  { method: 'GET', path: '/api/admin/testimonial-keywords', handler: ({ request }) => listBlockedKeywords(request) },
+  { method: 'POST', path: '/api/admin/testimonial-keywords', handler: ({ request, body }) => createBlockedKeyword(request, body) },
   { method: 'POST', path: '/api/admin/gallery/media', handler: ({ request, body }) => uploadGalleryMedia(request, body) },
   { method: 'GET', path: '/api/admin/gallery', handler: ({ request }) => listAdminGallery(request) },
   { method: 'POST', path: '/api/admin/gallery', handler: ({ request, body }) => createGallery(request, body) },
@@ -53,6 +68,21 @@ const routes = [
     method: 'DELETE',
     match: /^\/api\/admin\/gallery\/([^/]+)$/,
     handler: ({ request, match }) => deleteGallery(request, match[1]),
+  },
+  {
+    method: 'PUT',
+    match: /^\/api\/admin\/testimonials\/([^/]+)$/,
+    handler: ({ request, body, match }) => updateTestimonial(request, body, match[1]),
+  },
+  {
+    method: 'DELETE',
+    match: /^\/api\/admin\/testimonials\/([^/]+)$/,
+    handler: ({ request, match }) => deleteTestimonial(request, match[1]),
+  },
+  {
+    method: 'DELETE',
+    match: /^\/api\/admin\/testimonial-keywords\/([^/]+)$/,
+    handler: ({ request, match }) => deleteBlockedKeyword(request, match[1]),
   },
 ];
 

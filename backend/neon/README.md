@@ -15,6 +15,10 @@
    [`schema.sql`](./schema.sql) menyediakan skema admin dan menu yang sama.
    Setelah itu jalankan [`gallery-schema.sql`](./gallery-schema.sql) untuk
    membuat tabel galeri dan mengimpor galeri awal.
+   Jalankan [`testimonials-schema.sql`](./testimonials-schema.sql) untuk
+   membuat tabel ulasan dan keyword moderasi.
+   Jika tabel galeri sudah pernah dibuat, jalankan
+   [`gallery-category-migration.sql`](./gallery-category-migration.sql).
 
 3. Simpan connection string sebagai `DATABASE_URL` hanya di backend:
 
@@ -75,7 +79,14 @@ filesystem serverless tidak persisten.
 
 Halaman admin juga menyediakan pengelolaan foto dan video galeri. Format yang
 didukung adalah JPEG, PNG, WebP, GIF, MP4, WebM, dan OGG dengan ukuran maksimal
-3 MB per file. Di Vercel, media galeri disimpan sebagai data URL di database.
+3 MB per file. Setiap media dapat dikategorikan sebagai Momen, Tempat &
+Restoran, atau Fasilitas. Di Vercel, media galeri disimpan sebagai data URL di
+database.
+
+Ulasan pelanggan yang dikirim dari website berstatus menunggu persetujuan.
+Admin dapat menyetujui, menolak, atau menghapus ulasan melalui tab Kelola
+Ulasan. Keyword terlarang diperiksa di server sebelum ulasan disimpan dan
+sebelum ulasan disetujui untuk publik.
 
 ## Tes koneksi
 

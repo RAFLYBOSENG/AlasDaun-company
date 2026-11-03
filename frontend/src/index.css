@@ -84,6 +84,51 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* Alas Daun theme for the n8n chat widget. */
+n8n-chat {
+  --chat--color--primary: #2f5d3a;
+  --chat--color--primary-shade-50: #244b2e;
+  --chat--color--primary--shade-100: #1e3e2b;
+  --chat--color--secondary: #86a760;
+  --chat--color-secondary-shade-50: #6f8e4e;
+  --chat--color-white: #ffffff;
+  --chat--color-light: rgba(253, 248, 236, 0.9);
+  --chat--color-light-shade-50: rgba(236, 244, 224, 0.92);
+  --chat--color-light-shade-100: rgba(220, 232, 204, 0.95);
+  --chat--color-medium: #b7c8a0;
+  --chat--color-dark: #1e3e2b;
+  --chat--color-disabled: #9caf8a;
+  --chat--color-typing: #6f8e4e;
+  --chat--border-radius: 1.25rem;
+  --chat--message--bot--background: rgba(255, 255, 255, 0.72);
+  --chat--message--user--background: rgba(47, 93, 58, 0.92);
+  --chat--message--user--color: #ffffff;
+  --chat--window--border: 1px solid rgba(47, 93, 58, 0.2);
+  --chat--toggle--background: rgba(47, 93, 58, 0.9);
+  --chat--toggle--hover--background: #1e3e2b;
+  --chat--toggle--active--background: #1e3e2b;
+  --chat--toggle--color: #ffffff;
+  --chat--button--background--primary: rgba(47, 93, 58, 0.9);
+  --chat--button--background--primary--hover: #1e3e2b;
+  --chat--button--color--primary: #ffffff;
+  --chat--header--background: rgba(47, 93, 58, 0.92);
+  --chat--header--color: #ffffff;
+  --chat--body--background: rgba(253, 248, 236, 0.78);
+  --chat--footer--background: rgba(253, 248, 236, 0.78);
+  filter: drop-shadow(0 10px 24px rgba(30, 62, 43, 0.16));
+  transition: filter 300ms ease, opacity 300ms ease, transform 300ms ease;
+}
+
+n8n-chat:hover {
+  filter: drop-shadow(0 14px 30px rgba(30, 62, 43, 0.28));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  n8n-chat {
+    transition: none;
+  }
+}
+
 .menu-horizontal-scroll {
   -webkit-overflow-scrolling: touch;
   scrollbar-color: #86A760 #FDF8EC;
