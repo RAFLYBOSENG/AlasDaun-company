@@ -4,6 +4,70 @@ import { ArrowRight, Star, X } from 'lucide-react';
 import { useLang } from '../lib/language-context';
 import { categoryLabels } from '../data/menu';
 import { apiRequest } from '../lib/api';
+
+function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay = 0 }) {
+    const [imageOffset, setImageOffset] = useState(0);
+    const [previousOffset, setPreviousOffset] = useState(0);
+    const [rotationStarted, setRotationStarted] = useState(false);
+    const images = items.map((item) => item.image).filter(Boolean);
+    const collageDurationMs = 4000;
+
+    useEffect(() => {
+        if (images.length <= 4) return undefined;
+        const startTimeout = window.setTimeout(() => setRotationStarted(true), staggerDelay);
+        return () => window.clearTimeout(startTimeout);
+    }, [images.length, staggerDelay]);
+
+    useEffect(() => {
+        if (!rotationStarted || images.length <= 4) return undefined;
+        const interval = window.setInterval(() => {
+            setImageOffset((current) => {
+                setPreviousOffset(current);
+                return (current + 1) % images.length;
+            });
+        }, collageDurationMs);
+        return () => window.clearInterval(interval);
+    }, [images.length, rotationStarted]);
+
+    const visibleImages = Array.from({ length: 4 }, (_, index) => (
+        images[(imageOffset + index) % images.length]
+    ));
+
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`group overflow-hidden rounded-3xl border text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card ${accent ? 'border-oranye-200 bg-white' : 'border-daun-100 bg-white'}`}
+      >
+        <div className="grid h-56 grid-cols-2 grid-rows-2 gap-1 overflow-hidden bg-daun-100">
+          {visibleImages.map((image, index) => (
+            <div key={index} className="relative h-full w-full overflow-hidden bg-daun-100">
+              {previousOffset !== imageOffset && (
+                <img
+                  key={`previous-${previousOffset}-${index}`}
+                  src={images[(previousOffset + index) % images.length]}
+                  alt=""
+                  className="menu-collage-fade-out absolute inset-0 h-full w-full object-cover"
+                />
+              )}
+              <img
+                key={`current-${imageOffset}-${index}`}
+                src={image}
+                alt=""
+                loading="lazy"
+                className="menu-collage-fade-in absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-between gap-4 p-5">
+          <h3 className="font-heading text-xl font-bold text-daun-700">{title}</h3>
+          <ArrowRight size={20} className="shrink-0 text-oranye-500 transition-transform group-hover:translate-x-1" />
+        </div>
+      </button>
+    );
+}
+
 export function MenuSection() {
     const { lang, dict } = useLang();
     const [active, setActive] = useState('all');
@@ -38,10 +102,10 @@ export function MenuSection() {
     const featuredItems = menuItems.filter((item) => item.isRecommended || item.promo);
     const packageItems = menuItems.filter((item) => item.category === 'paket-makanan');
     const regularItems = menuItems.filter((item) => item.category !== 'paket-makanan' && !item.isRecommended && !item.promo);
+    const otherItems = menuItems.filter((item) => item.category !== 'paket-makanan');
     const filteredAll = useMemo(() => (
         menuItems.filter((item) => {
             if (item.category === 'paket-makanan') return false;
-            if (active === 'recommended') return item.isRecommended || item.promo;
             return active === 'all' || item.category === active;
         })
     ), [active, menuItems]);
@@ -63,7 +127,6 @@ export function MenuSection() {
             window.removeEventListener('keydown', closeOnEscape);
         };
     }, [selectedMenu, showAll, showFeatured, showPackages]);
-    const displayedItems = regularItems.slice(0, 4);
     const formatPrice = (price) => `Rp ${price.toLocaleString('id-ID')}`;
 
     const renderMenuCard = (m, inGrid = false) => {
@@ -94,11 +157,6 @@ export function MenuSection() {
                   )}
                 </div>
               )}
-                  {m.promo && (
-                    <span className="absolute right-3 top-3 rounded-lg border border-white/80 bg-red-600 px-2.5 py-1.5 font-body text-xs font-bold text-white shadow-[0_4px_12px_rgba(127,29,29,0.35)]">
-                      {lang === 'id' ? 'PROMO' : 'PROMO'} -{m.promo}%
-                    </span>
-                  )}
                 </div>
             <div className="flex min-h-32 flex-1 flex-col p-4">
               <h3 className="mb-1.5 font-heading text-base font-bold text-daun-700 transition-colors duration-300 group-hover:text-oranye-600">{m.name}</h3>
@@ -118,7 +176,7 @@ export function MenuSection() {
                   </span>
                 </div>
                 {m.promo && (
-                  <span className="text-right font-body text-xs font-bold text-red-600">
+                  <span className="inline-flex shrink-0 items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-1 font-body text-[11px] font-bold text-red-600 shadow-sm">
                     Hemat {m.promo}%
                   </span>
                 )}
@@ -136,81 +194,22 @@ export function MenuSection() {
           <div className="mx-auto h-1 w-20 rounded-full bg-oranye-500"/>
         </div>
 
-        {!loading && !error && featuredItems.length > 0 && (
-          <div className="mb-14 rounded-3xl border border-oranye-100 bg-white/60 p-4 shadow-soft sm:p-6">
-            <div className="mb-5 flex items-center gap-3 border-b border-daun-100 pb-4">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-oranye-500 text-white shadow-soft">
-                <Star size={18} fill="currentColor"/>
-              </span>
-              <h3 className="font-heading text-2xl font-bold text-daun-700 sm:text-3xl">
-                {dict.menu.recommended}
-              </h3>
-            </div>
-            <div
-              aria-label={dict.menu.recommended}
-              className="menu-horizontal-scroll flex snap-x snap-mandatory touch-pan-x gap-4 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4"
-            >
-              {featuredItems.slice(0, 4).map((item) => renderMenuCard(item, true))}
-            </div>
-            <div className="mt-5 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setShowFeatured(true)}
-                className="group btn-accent px-7 py-3.5 text-sm font-semibold shadow-lg transition-transform hover:-translate-y-0.5 sm:text-base"
-              >
-                {lang === 'id' ? 'Lihat Recommended dan Promo' : 'View Recommended and Promo'}
-                <ArrowRight size={18} aria-hidden="true" className="ml-2 inline-block transition-transform group-hover:translate-x-1"/>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {!loading && !error && packageItems.length > 0 && (
-          <div className="mb-14 rounded-3xl border border-daun-100 bg-white/60 p-4 shadow-soft sm:p-6">
-            <div className="mb-5 flex items-end justify-between border-b border-daun-100 pb-4">
-              <h3 className="font-heading text-2xl font-bold text-daun-700 sm:text-3xl">
-                {lang === 'id' ? 'Paket Makanan' : 'Meal Packages'}
-              </h3>
-            </div>
-            <div className="menu-horizontal-scroll flex snap-x snap-mandatory touch-pan-x gap-4 overflow-x-auto pb-3 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
-              {packageItems.slice(0, 4).map((item) => renderMenuCard(item, true))}
-            </div>
-            <div className="mt-5 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setShowPackages(true)}
-                className="group btn-accent px-7 py-3.5 text-sm font-semibold shadow-lg transition-transform hover:-translate-y-0.5 sm:text-base"
-              >
-                {lang === 'id' ? 'Lihat menu paket' : 'View meal packages'}
-                <ArrowRight size={18} aria-hidden="true" className="ml-2 inline-block transition-transform group-hover:translate-x-1"/>
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Menu cards */}
         {error ? (<p role="alert" className="py-10 text-center font-body text-red-700">{error}</p>) : loading ? (
             <p className="py-10 text-center font-body text-daun-500">Memuat daftar menu...</p>
-        ) : menuItems.length === 0 ? (<p className="py-10 text-center font-body text-daun-500">Menu belum tersedia.</p>) : (<div className="rounded-3xl border border-daun-100 bg-white/60 p-4 shadow-soft sm:p-6">
-            <div className="mb-5 flex items-end justify-between border-b border-daun-100 pb-4">
-              <h3 className="font-heading text-2xl font-bold text-daun-700 sm:text-3xl">
-                {lang === 'id' ? 'Menu Lainnya' : 'Other Menu'}
-              </h3>
-            </div>
-            <div className="no-scrollbar menu-horizontal-scroll col-span-full flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
-              {displayedItems.map((item) => renderMenuCard(item, true))}
-            </div>
-            <div className="col-span-full mt-5 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setShowAll(true)}
-                className="group btn-accent px-7 py-3.5 text-sm font-semibold shadow-lg transition-transform hover:-translate-y-0.5 sm:text-base"
-              >
-                {lang === 'id' ? 'Lihat menu lainnya' : 'View all menu'}
-                <ArrowRight size={18} aria-hidden="true" className="transition-transform group-hover:translate-x-1"/>
-              </button>
-            </div>
-          </div>)}
+        )         : menuItems.length === 0 ? (<p className="py-10 text-center font-body text-daun-500">Menu belum tersedia.</p>) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredItems.length > 0 && (
+              <MenuCategoryCard title="Recommended & Promo" items={featuredItems} onClick={() => setShowFeatured(true)} accent staggerDelay={0} />
+            )}
+            {packageItems.length > 0 && (
+              <MenuCategoryCard title={lang === 'id' ? 'Paket Makanan' : 'Meal Packages'} items={packageItems} onClick={() => setShowPackages(true)} staggerDelay={1300} />
+            )}
+            {otherItems.length > 0 && (
+              <MenuCategoryCard title="Menu Ala Carte" items={otherItems} onClick={() => setShowAll(true)} staggerDelay={2600} />
+            )}
+          </div>
+        )}
 
       </div>
       {showPackages && createPortal(
@@ -295,7 +294,7 @@ export function MenuSection() {
           >
             <div className="flex items-center justify-between border-b border-daun-100 px-5 py-4 sm:px-7">
               <h3 id="all-menu-title" className="font-heading text-xl font-bold text-daun-700 sm:text-2xl">
-                {lang === 'id' ? 'Semua Menu' : 'All Menu'}
+                Menu Ala Carte
               </h3>
               <button
                 type="button"
@@ -308,17 +307,6 @@ export function MenuSection() {
             </div>
             <div className="overflow-y-auto p-4 sm:p-7">
               <div className="no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-2">
-                {featuredItems.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setActive('recommended')}
-                    aria-pressed={active === 'recommended'}
-                    className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${active === 'recommended' ? 'bg-oranye-500 text-white shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
-                  >
-                    <Star size={14} fill="currentColor"/>
-                    {dict.menu.recommended}
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={() => setActive('all')}
@@ -393,6 +381,11 @@ export function MenuSection() {
                     ? Math.round(selectedMenu.price * (1 - selectedMenu.promo / 100))
                     : selectedMenu.price)}
                 </span>
+                {selectedMenu.promo && (
+                  <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-1 font-body text-xs font-bold text-red-600 shadow-sm">
+                    Hemat {selectedMenu.promo}%
+                  </span>
+                )}
               </div>
             </div>
           </div>
