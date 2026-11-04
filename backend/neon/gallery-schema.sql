@@ -19,8 +19,10 @@ CREATE TABLE IF NOT EXISTS gallery_items (
 CREATE INDEX IF NOT EXISTS gallery_items_public_order_idx
   ON gallery_items (is_active, sort_order, created_at);
 
-CREATE UNIQUE INDEX IF NOT EXISTS gallery_items_media_url_idx
-  ON gallery_items (media_url);
+DROP INDEX IF EXISTS gallery_items_media_url_idx;
+
+CREATE UNIQUE INDEX gallery_items_media_url_idx
+  ON gallery_items (md5(media_url));
 
 CREATE OR REPLACE FUNCTION set_gallery_items_updated_at()
 RETURNS trigger
@@ -53,4 +55,4 @@ VALUES
   ('image', 'https://images.pexels.com/photos/37081088/pexels-photo-37081088.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Sepiring makan dengan es teh segar', 9),
   ('image', 'https://images.pexels.com/photos/8507683/pexels-photo-8507683.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Keluarga makan bersama dengan gembira', 10),
   ('image', 'https://images.pexels.com/photos/37081070/pexels-photo-37081070.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Daging gepuk goreng renyah', 11)
-ON CONFLICT (media_url) DO NOTHING;
+ON CONFLICT DO NOTHING;

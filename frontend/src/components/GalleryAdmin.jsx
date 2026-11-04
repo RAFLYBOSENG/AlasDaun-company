@@ -167,7 +167,7 @@ export function GalleryAdmin({ onError, onNotice }) {
       {showForm && (
         <div
           role="presentation"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-daun-900/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-daun-900/50 p-2 backdrop-blur-sm sm:items-center sm:p-4"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !saving) closeForm();
           }}
@@ -177,10 +177,10 @@ export function GalleryAdmin({ onError, onNotice }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="gallery-form-title"
-            className="max-h-[calc(100vh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-daun-100 bg-white p-5 shadow-2xl sm:p-7"
+            className="flex max-h-[calc(100dvh-1rem)] min-w-0 w-full max-w-2xl flex-col overflow-y-auto rounded-2xl border border-daun-100 bg-white p-4 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:p-7"
           >
-            <div className="mb-5 flex items-center justify-between">
-              <h2 id="gallery-form-title" className="font-heading text-xl font-bold text-daun-700">{editingId ? 'Ubah media' : 'Tambah media'}</h2>
+            <div className="mb-4 flex items-center justify-between gap-3 sm:mb-5">
+              <h2 id="gallery-form-title" className="min-w-0 font-heading text-xl font-bold text-daun-700">{editingId ? 'Ubah media' : 'Tambah media'}</h2>
               <button ref={closeButtonRef} type="button" onClick={closeForm} aria-label="Tutup form" className="rounded-full p-2 text-daun-500 hover:bg-daun-50"><X size={20} /></button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -207,10 +207,10 @@ export function GalleryAdmin({ onError, onNotice }) {
               </label>
               {editingId && <label className="flex items-center gap-2 self-end pb-3 text-sm font-medium text-daun-700"><input name="isActive" type="checkbox" checked={form.isActive} onChange={updateField} className="h-4 w-4 accent-daun-500" /> Tampilkan di website</label>}
             </div>
-            {previewUrl && (form.type === 'video' ? <video src={previewUrl} controls className="mt-4 h-40 w-64 rounded-xl border border-daun-100 object-cover" /> : <img src={previewUrl} alt="Pratinjau galeri" className="mt-4 h-40 w-64 rounded-xl border border-daun-100 object-cover" />)}
-            <div className="mt-5 flex flex-wrap justify-end gap-3">
-              <button type="button" onClick={closeForm} disabled={saving} className="btn-outline disabled:opacity-60">Batal</button>
-              <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">{saving ? 'Menyimpan...' : 'Simpan media'}</button>
+            {previewUrl && (form.type === 'video' ? <video src={previewUrl} controls className="mt-4 h-auto max-h-52 w-full max-w-sm rounded-xl border border-daun-100 object-contain sm:h-40" /> : <img src={previewUrl} alt="Pratinjau galeri" className="mt-4 h-auto max-h-52 w-full max-w-sm rounded-xl border border-daun-100 object-contain sm:h-40" />)}
+            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button type="button" onClick={closeForm} disabled={saving} className="btn-outline w-full disabled:opacity-60 sm:w-auto">Batal</button>
+              <button type="submit" disabled={saving} className="btn-primary w-full disabled:opacity-60 sm:w-auto">{saving ? 'Menyimpan...' : 'Simpan media'}</button>
             </div>
           </form>
         </div>

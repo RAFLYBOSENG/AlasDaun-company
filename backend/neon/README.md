@@ -15,6 +15,9 @@
    [`schema.sql`](./schema.sql) menyediakan skema admin dan menu yang sama.
    Setelah itu jalankan [`gallery-schema.sql`](./gallery-schema.sql) untuk
    membuat tabel galeri dan mengimpor galeri awal.
+   Jika tabel galeri sudah dibuat sebelum dukungan unggah media ditambahkan,
+   jalankan [`gallery-media-url-index-migration.sql`](./gallery-media-url-index-migration.sql)
+   untuk mengganti indeks URL yang tidak dapat menangani data URL berukuran besar.
    Jalankan [`testimonials-schema.sql`](./testimonials-schema.sql) untuk
    membuat tabel ulasan dan keyword moderasi.
    Jika tabel galeri sudah pernah dibuat, jalankan
