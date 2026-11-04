@@ -340,6 +340,9 @@ export function Admin() {
 
   async function updateQuickSetting(item, updates) {
     setError('');
+    setItems((current) => current.map((entry) => (
+      entry.id === item.id ? { ...entry, ...updates } : entry
+    )));
     try {
       const result = await apiRequest(`/api/admin/menu/${item.id}`, {
         method: 'PUT',
@@ -349,13 +352,15 @@ export function Admin() {
           price: Number(item.price),
           promo: updates.promo === undefined ? item.promo : updates.promo,
           sortOrder: Number(item.sortOrder),
-          isActive: item.isActive !== false,
         },
       });
       setItems((current) => current.map((entry) => (
         entry.id === item.id ? result.data : entry
       )));
     } catch (requestError) {
+      setItems((current) => current.map((entry) => (
+        entry.id === item.id ? item : entry
+      )));
       setError(requestError.message);
     }
   }
@@ -612,26 +617,6 @@ export function Admin() {
                 Deskripsi Bahasa Inggris
                 <textarea name="descriptionEn" value={form.descriptionEn} onChange={updateField} required maxLength={1000} rows="3" className={inputClass} />
               </label>
-              <label className="text-sm font-medium text-daun-700">
-                Urutan tampil
-                <input name="sortOrder" type="number" min="0" step="1" value={form.sortOrder} onChange={updateField} className={inputClass} />
-              </label>
-              {editingId && (
-                <label className="flex items-center gap-2 self-end pb-3 text-sm font-medium text-daun-700">
-                  <input name="isActive" type="checkbox" checked={form.isActive} onChange={updateField} className="h-4 w-4 accent-daun-500" />
-                  Tampilkan di website
-                </label>
-              )}
-            </div>
-            <div className="my-5 flex flex-wrap gap-5">
-              <label className="flex items-center gap-2 text-sm text-daun-700">
-                <input name="isRecommended" type="checkbox" checked={form.isRecommended} onChange={updateField} className="h-4 w-4 accent-daun-500" />
-                Recommended
-              </label>
-              <label className="flex items-center gap-2 text-sm text-daun-700">
-                <input name="isNew" type="checkbox" checked={form.isNew} onChange={updateField} className="h-4 w-4 accent-daun-500" />
-                Menu baru
-              </label>
             </div>
             <button type="submit" disabled={saving} className="btn-primary disabled:cursor-not-allowed disabled:opacity-60">
               {saving ? 'Menyimpan...' : editingId ? 'Simpan perubahan' : 'Simpan menu'}
@@ -648,7 +633,7 @@ export function Admin() {
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-daun-50 text-daun-700">
                   <tr>
-                    <th className="px-2 py-3 font-semibold sm:px-5">Pengaturan</th>
+                    <th className="px-2 py-3 text-center font-semibold sm:px-5">Tampilkan</th>
                     <th className="px-5 py-3 font-semibold">
                       <button type="button" onClick={() => changeSort('name')} className="flex items-center gap-1 sm:gap-2">
                         Menu {sortIndicator('name')}
@@ -665,66 +650,83 @@ export function Admin() {
                         Harga {sortIndicator('price')}
                       </button>
                     </th>
-                    <th className="px-5 py-3 font-semibold">Status</th>
                     <th className="px-5 py-3 text-right font-semibold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-daun-50">
                   {visibleItems.length === 0 && (
                     <tr>
-                      <td colSpan="7" className="px-5 py-12 text-center text-daun-500">
+                      <td colSpan="6" className="px-5 py-12 text-center text-daun-500">
                         Menu tidak ditemukan. Ubah kata pencarian atau filter kategori.
                       </td>
                     </tr>
                   )}
                   {pagedItems.map((item) => (
                     <tr key={item.id}>
-                      <td className="px-2 py-3 align-top sm:px-5 sm:py-4">
-                        <div className="flex flex-col gap-2 overflow-hidden">
-                          <label className="flex items-center gap-2 text-xs text-daun-700" title="Recommended">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(item.isRecommended)}
-                              onChange={(event) => updateQuickSetting(item, { isRecommended: event.target.checked })}
-                              className="h-4 w-4 accent-daun-500"
-                            />
-                            Recommended
-                          </label>
-                          <label className="flex items-center gap-2 text-xs text-daun-700" title="Menu baru">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(item.isNew)}
-                              onChange={(event) => updateQuickSetting(item, { isNew: event.target.checked })}
-                              className="h-4 w-4 accent-daun-500"
-                            />
-                            Menu baru
-                          </label>
-                          <label className="flex items-center gap-1 text-xs text-daun-700" title="Promo">
-                            Promo
-                            <input
-                              type="number"
-                              min="1"
-                              max="99"
-                              value={item.promo ?? ''}
-                              onChange={(event) => {
-                                const promo = event.target.value === '' ? null : Number(event.target.value);
-                                setItems((current) => current.map((entry) => (
-                                  entry.id === item.id ? { ...entry, promo } : entry
-                                )));
-                              }}
-                              onBlur={(event) => {
-                                const value = event.target.value === '' ? null : Number(event.target.value);
-                                updateQuickSetting(item, { promo: value });
-                              }}
-                              className="w-14 rounded border border-daun-200 px-1 py-1 text-right outline-none focus:border-daun-500"
-                            />
-                            %
-                          </label>
-                        </div>
+                      <td className="px-2 py-3 text-center align-top sm:px-5 sm:py-4">
+                        <label className="inline-flex cursor-pointer items-center justify-center" title={item.isActive !== false ? 'Sembunyikan dari website' : 'Tampilkan di website'}>
+                          <input
+                            type="checkbox"
+                            checked={item.isActive !== false}
+                            onChange={(event) => updateQuickSetting(item, { isActive: event.target.checked })}
+                            className="h-5 w-5 accent-daun-500"
+                            aria-label={`${item.isActive !== false ? 'Sembunyikan' : 'Tampilkan'} ${item.name} di website`}
+                          />
+                        </label>
                       </td>
                       <td className="px-2 py-3 align-top sm:px-5 sm:py-4">
-                        <p className="font-semibold text-daun-800">{item.name}</p>
-                        <p className="mt-1 text-xs text-daun-500">{item.isRecommended ? 'Recommended · ' : ''}{item.isNew ? 'Menu baru · ' : ''}{item.isActive ? 'Aktif' : 'Disembunyikan'}</p>
+                        <div className="flex min-w-64 items-start justify-between gap-3">
+                          <div>
+                            <p className="font-semibold text-daun-800">{item.name}</p>
+                            <p className="mt-1 text-xs text-daun-500">{item.isActive === false ? 'Disembunyikan' : 'Ditampilkan'}</p>
+                          </div>
+                          <div className="grid grid-cols-[auto_9rem] items-center gap-x-3 gap-y-1.5">
+                            <label className="inline-flex cursor-pointer items-center gap-2 text-[11px] font-semibold text-daun-600">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(item.isRecommended)}
+                                onChange={(event) => updateQuickSetting(item, { isRecommended: event.target.checked })}
+                                className="sr-only"
+                              />
+                              <span className={`relative h-5 w-9 rounded-full transition-colors ${item.isRecommended ? 'bg-oranye-500' : 'bg-daun-200'}`}>
+                                <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${item.isRecommended ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                              </span>
+                              Recommended
+                            </label>
+                            <span aria-hidden="true" />
+                            <label className="inline-flex cursor-pointer items-center gap-2 text-[11px] font-semibold text-daun-600">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(item.isNew)}
+                                onChange={(event) => updateQuickSetting(item, { isNew: event.target.checked })}
+                                className="sr-only"
+                              />
+                              <span className={`relative h-5 w-9 rounded-full transition-colors ${item.isNew ? 'bg-oranye-500' : 'bg-daun-200'}`}>
+                                <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${item.isNew ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                              </span>
+                              Baru
+                            </label>
+                            <label className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2 py-1 text-[11px] font-semibold text-red-600">
+                              Promo
+                              <input
+                                type="number"
+                                min="1"
+                                max="99"
+                                value={item.promo ?? ''}
+                                onChange={(event) => {
+                                  const promo = event.target.value === '' ? null : Number(event.target.value);
+                                  setItems((current) => current.map((entry) => (
+                                    entry.id === item.id ? { ...entry, promo } : entry
+                                  )));
+                                  const value = event.target.value === '' ? null : Number(event.target.value);
+                                  updateQuickSetting(item, { promo: value });
+                                }}
+                                className="w-12 rounded border border-red-200 bg-white px-1 py-0.5 text-right outline-none focus:border-red-400"
+                              />
+                              %
+                            </label>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-2 py-3 align-top sm:px-5 sm:py-4">
                         {item.image ? (
@@ -739,7 +741,6 @@ export function Admin() {
                       </td>
                       <td className="break-all px-2 py-3 text-daun-600 sm:px-5 sm:py-4">{item.category}</td>
                       <td className="whitespace-nowrap px-2 py-3 text-daun-700 sm:px-5 sm:py-4">{priceLabel(item.price)}</td>
-                      <td className="px-2 py-3 text-daun-600 sm:px-5 sm:py-4">{item.promo ? `Promo ${item.promo}%` : '—'}</td>
                       <td className="px-2 py-3 sm:px-5 sm:py-4">
                         <div className="flex justify-end gap-2">
                           <button onClick={() => startEdit(item)} aria-label={`Ubah ${item.name}`} className="rounded-full p-2 text-daun-600 hover:bg-daun-50">
