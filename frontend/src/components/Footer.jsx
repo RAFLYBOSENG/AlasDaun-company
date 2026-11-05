@@ -1,4 +1,4 @@
-import { Leaf, Instagram, Facebook, Youtube, MapPin, Phone, Mail, ExternalLink } from 'lucide-react';
+import { Instagram, Facebook, Youtube, MapPin, Phone, Mail, ExternalLink } from 'lucide-react';
 import { useLang } from '../lib/language-context';
 import { restaurantInfo } from '../data/content';
 export function Footer() {
@@ -16,11 +16,8 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <div className="mb-4 flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-500 text-krem-100">
-                <Leaf size={20}/>
-              </span>
-              <span className="font-heading text-xl font-bold">Alas Daun</span>
+            <div className="mb-4">
+              <img src="/logo-alas-daun2.png" alt="Alas Daun" className="h-14 w-auto max-w-52 object-contain" />
             </div>
             <p className="mb-4 font-body text-sm leading-relaxed text-krem-100/70">
               {lang === 'id'
