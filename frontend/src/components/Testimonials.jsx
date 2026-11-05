@@ -56,7 +56,7 @@ export function Testimonials() {
       <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-daun-600/40 blur-3xl"/>
       <div className="absolute -right-20 bottom-10 h-64 w-64 rounded-full bg-oranye-500/20 blur-3xl"/>
 
-      <div className="relative mx-auto max-w-6xl px-6">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-300">{dict.testimonials.title}</p>
           <h2 className="mb-3 font-heading text-3xl font-bold text-krem-100 sm:text-4xl">{dict.testimonials.subtitle}</h2>
@@ -64,21 +64,21 @@ export function Testimonials() {
         </div>
 
         <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-          <div className="lg:order-2">
+          <div className="min-w-0 lg:order-2">
         {count > 0 && <div className="relative">
           <div className="overflow-hidden">
             <div className="flex transition-transform duration-700 ease-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
-              {items.map((tst) => (<div key={tst.id} className="w-full flex-shrink-0 px-2">
-                  <div className="mx-auto max-w-2xl rounded-3xl bg-krem-100/10 p-8 backdrop-blur-sm ring-1 ring-krem-100/15 sm:p-10">
+              {items.map((tst) => (<div key={tst.id} className="w-full min-w-0 flex-shrink-0 px-1 sm:px-2">
+                  <div className="mx-auto w-full max-w-2xl rounded-2xl bg-krem-100/10 p-5 backdrop-blur-sm ring-1 ring-krem-100/15 sm:rounded-3xl sm:p-10">
                     <Quote size={36} className="mb-4 text-oranye-300"/>
                     <div className="mb-4 flex gap-1">
                       {Array.from({ length: tst.rating }).map((_, i) => <Star key={i} size={18} className="text-oranye-400" fill="currentColor"/>)}
                     </div>
-                    <p className="mb-6 font-body text-base leading-relaxed text-krem-100/90 sm:text-lg">"{lang === 'id' ? tst.textId : (tst.textEn || tst.textId)}"</p>
+                    <p className="mb-6 break-words font-body text-sm leading-relaxed text-krem-100/90 sm:text-base lg:text-lg">"{lang === 'id' ? tst.textId : (tst.textEn || tst.textId)}"</p>
                     <div className="flex items-center gap-3">
                       <img src={tst.avatar || avatarFor(tst.name)} alt={tst.name} loading="lazy" className="h-12 w-12 rounded-full object-cover ring-2 ring-oranye-300/40"/>
-                      <div>
-                        <p className="font-heading text-base font-bold text-krem-100">{tst.name}</p>
+                      <div className="min-w-0">
+                        <p className="break-words font-heading text-base font-bold text-krem-100">{tst.name}</p>
                         <p className="font-body text-xs text-krem-100/60">{lang === 'id' ? 'Pelanggan Alas Daun' : 'Alas Daun Guest'}</p>
                       </div>
                     </div>
@@ -86,8 +86,8 @@ export function Testimonials() {
                 </div>))}
             </div>
           </div>
-          <button onClick={prev} className="absolute -left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-krem-100/20 text-krem-100 transition hover:bg-krem-100/30 sm:-left-4" aria-label="Previous"><ChevronLeft size={20}/></button>
-          <button onClick={next} className="absolute -right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-krem-100/20 text-krem-100 transition hover:bg-krem-100/30 sm:-right-4" aria-label="Next"><ChevronRight size={20}/></button>
+          <button onClick={prev} className="absolute left-1 top-full mt-3 flex h-9 w-9 items-center justify-center rounded-full bg-krem-100/20 text-krem-100 transition hover:bg-krem-100/30 sm:-left-4 sm:top-1/2 sm:mt-0 sm:h-10 sm:w-10 sm:-translate-y-1/2" aria-label="Previous"><ChevronLeft size={20}/></button>
+          <button onClick={next} className="absolute right-1 top-full mt-3 flex h-9 w-9 items-center justify-center rounded-full bg-krem-100/20 text-krem-100 transition hover:bg-krem-100/30 sm:-right-4 sm:top-1/2 sm:mt-0 sm:h-10 sm:w-10 sm:-translate-y-1/2" aria-label="Next"><ChevronRight size={20}/></button>
         </div>}
 
         <div className="mt-8 flex justify-center gap-2">

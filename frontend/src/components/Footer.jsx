@@ -1,4 +1,4 @@
-import { Leaf, Instagram, Facebook, Youtube, MapPin, Phone, Mail } from 'lucide-react';
+import { Leaf, Instagram, Facebook, Youtube, MapPin, Phone, Mail, ExternalLink } from 'lucide-react';
 import { useLang } from '../lib/language-context';
 import { restaurantInfo } from '../data/content';
 export function Footer() {
@@ -12,7 +12,7 @@ export function Footer() {
         { href: '#lokasi', label: dict.nav.location },
     ];
     return (<footer id="kontak" className="bg-daun-900 text-krem-100">
-      <div className="mx-auto max-w-7xl px-6 py-14">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-3">
           {/* Brand */}
           <div>
@@ -35,7 +35,7 @@ export function Footer() {
           {/* Quick links */}
           <div>
             <h4 className="mb-4 font-heading text-base font-bold text-krem-100">{dict.footer.quick}</h4>
-            <ul className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-flow-col grid-cols-2 grid-rows-3 gap-x-4 gap-y-2">
               {quickLinks.map((l) => (<li key={l.href}>
                   <button onClick={() => document.querySelector(l.href)?.scrollIntoView({ behavior: 'smooth' })} className="font-body text-sm text-krem-100/70 transition hover:text-oranye-300">
                     {l.label}
@@ -74,12 +74,20 @@ export function Footer() {
                 <Youtube size={18}/>
               </a>
             </div>
+            <a
+              href="/links"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-oranye-300/30 px-3.5 py-2 font-body text-sm font-medium text-oranye-300 transition hover:border-oranye-300 hover:bg-oranye-500 hover:text-white"
+            >
+              Link In Bio <ExternalLink size={13} />
+            </a>
           </div>
         </div>
       </div>
 
       <div className="border-t border-daun-800">
-        <div className="mx-auto max-w-7xl px-6 py-5">
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
           <p className="text-center font-body text-xs text-krem-100/50">
             &copy; {year} Rumah Makan Alas Daun. {dict.footer.rights}.
           </p>

@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowRight, Star, X } from 'lucide-react';
+import { ArrowRight, BadgePercent, Sparkles, Star, X } from 'lucide-react';
 import { useLang } from '../lib/language-context';
 import { categoryLabels } from '../data/menu';
 import { apiRequest } from '../lib/api';
 
-function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay = 0 }) {
+function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay = 0, badges = [] }) {
     const [imageOffset, setImageOffset] = useState(0);
     const [previousOffset, setPreviousOffset] = useState(0);
     const [rotationStarted, setRotationStarted] = useState(false);
@@ -37,9 +37,33 @@ function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay 
       <button
         type="button"
         onClick={onClick}
-        className={`group overflow-hidden rounded-3xl border text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card ${accent ? 'border-oranye-200 bg-white' : 'border-daun-100 bg-white'}`}
+        className={`group relative isolate overflow-hidden rounded-3xl border text-left shadow-soft transition-all duration-500 ease-out hover:-translate-y-2 hover:scale-[1.015] motion-reduce:transform-none motion-reduce:transition-none ${
+          accent
+            ? 'border-oranye-200 bg-white hover:border-oranye-400 hover:shadow-[0_22px_55px_-18px_rgba(249,115,22,.48)]'
+            : 'border-daun-100 bg-white hover:border-daun-400 hover:shadow-[0_22px_55px_-18px_rgba(22,101,52,.42)]'
+        }`}
       >
-        <div className="grid h-56 grid-cols-2 grid-rows-2 gap-1 overflow-hidden bg-daun-100">
+        <div className={`pointer-events-none absolute inset-x-0 top-0 z-20 h-1 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100 ${accent ? 'bg-gradient-to-r from-amber-300 via-oranye-500 to-red-500' : 'bg-gradient-to-r from-daun-300 via-daun-500 to-emerald-400'}`} />
+        <div className="relative grid h-56 grid-cols-2 grid-rows-2 gap-1 overflow-hidden bg-daun-100">
+          <div className={`pointer-events-none absolute inset-0 z-[5] opacity-0 transition-opacity duration-500 group-hover:opacity-100 ${
+            accent
+              ? 'bg-gradient-to-tr from-oranye-900/35 via-transparent to-amber-200/25'
+              : 'bg-gradient-to-tr from-daun-900/35 via-transparent to-emerald-200/20'
+          }`} />
+          {badges.length > 0 && (
+            <div className="absolute left-0 top-0 z-10 flex flex-col items-start gap-1.5 pt-3">
+              {badges.map((badge, index) => (
+                <span
+                  key={badge.label}
+                  className={`relative inline-flex min-h-8 items-center gap-1.5 px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,.22)] before:absolute before:left-0 before:top-full before:border-b-0 before:border-l-[8px] before:border-l-transparent before:border-t-[8px] ${badge.type === 'recommended' ? 'bg-gradient-to-r from-amber-500 to-oranye-500 before:border-t-amber-800' : 'bg-gradient-to-r from-red-600 to-rose-500 before:border-t-red-900'} ${index % 2 === 0 ? '-translate-x-1 -rotate-3' : '-translate-x-2 rotate-2'}`}
+                  style={{ clipPath: 'polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%)' }}
+                >
+                  {badge.type === 'recommended' ? <Star size={13} fill="currentColor" /> : <BadgePercent size={13} />}
+                  {badge.label}
+                </span>
+              ))}
+            </div>
+          )}
           {visibleImages.map((image, index) => (
             <div key={index} className="relative h-full w-full overflow-hidden bg-daun-100">
               {previousOffset !== imageOffset && (
@@ -60,9 +84,16 @@ function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay 
             </div>
           ))}
         </div>
-        <div className="flex items-center justify-between gap-4 p-5">
-          <h3 className="font-heading text-xl font-bold text-daun-700">{title}</h3>
-          <ArrowRight size={20} className="shrink-0 text-oranye-500 transition-transform group-hover:translate-x-1" />
+        <div className="relative flex items-center justify-between gap-4 overflow-hidden p-5">
+          <div className={`absolute bottom-0 left-0 h-full w-24 -translate-x-full skew-x-[-20deg] opacity-0 blur-sm transition-all duration-700 group-hover:translate-x-[420%] group-hover:opacity-25 ${
+            accent ? 'bg-gradient-to-r from-transparent via-orange-300 to-transparent' : 'bg-gradient-to-r from-transparent via-emerald-300 to-transparent'
+          }`} />
+          <h3 className={`font-heading text-xl font-bold transition-colors duration-300 ${accent ? 'text-daun-700 group-hover:text-oranye-600' : 'text-daun-700 group-hover:text-daun-500'}`}>{title}</h3>
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300 group-hover:rotate-[-8deg] group-hover:scale-110 ${
+            accent ? 'bg-oranye-50 text-oranye-500 group-hover:bg-oranye-500 group-hover:text-white' : 'bg-daun-50 text-daun-500 group-hover:bg-daun-600 group-hover:text-white'
+          }`}>
+            <ArrowRight size={20} className="transition-transform duration-300 group-hover:translate-x-0.5" />
+          </span>
         </div>
       </button>
     );
@@ -137,21 +168,28 @@ export function MenuSection() {
             key={m.id}
             onClick={() => setSelectedMenu(m)}
             aria-label={`${m.name} - ${lang === 'id' ? 'lihat detail menu' : 'view menu details'}`}
-            className={`group flex ${inGrid ? 'w-full min-w-0' : 'w-72 flex-none'} transform-gpu flex-col overflow-hidden rounded-2xl border border-transparent bg-krem-50 text-left shadow-soft transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:border-oranye-300 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-daun-500 focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none`}
+            className={`group flex ${inGrid ? 'w-full min-w-0' : 'w-72 flex-none'} transform-gpu flex-col overflow-hidden rounded-2xl border bg-krem-50 text-left shadow-soft transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-daun-500 focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none ${m.isRecommended ? 'border-oranye-300/80 hover:border-oranye-400' : m.promo ? 'border-red-300/70 hover:border-red-400' : 'border-transparent hover:border-oranye-300'}`}
           >
             <div className="relative h-36 w-full overflow-hidden">
               <img src={m.image} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none"/>
               <div className="absolute inset-0 bg-gradient-to-t from-daun-900/50 via-transparent to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100"/>
-              {(m.isRecommended || m.isNew) && (
+              {(m.isRecommended || m.promo || m.isNew) && (
                 <div className="absolute left-3 top-3 flex max-w-[calc(100%-24px)] flex-wrap gap-1.5">
                   {m.isRecommended && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-oranye-500 px-3 py-1 font-body text-xs font-semibold text-white shadow-soft">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-gradient-to-r from-oranye-500 to-amber-400 px-3 py-1.5 font-body text-[11px] font-bold uppercase tracking-wide text-white shadow-[0_4px_14px_rgba(234,88,12,.35)] backdrop-blur-sm">
                       <Star size={12} fill="currentColor"/>
                       {dict.menu.recommended}
                     </span>
                   )}
+                  {m.promo && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-gradient-to-r from-red-600 to-rose-500 px-3 py-1.5 font-body text-[11px] font-bold text-white shadow-[0_4px_14px_rgba(220,38,38,.35)] backdrop-blur-sm">
+                      <BadgePercent size={13}/>
+                      -{m.promo}%
+                    </span>
+                  )}
                   {m.isNew && (
-                    <span className="inline-flex rounded-full bg-daun-500 px-3 py-1 font-body text-xs font-semibold text-krem-100 shadow-soft">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-white/30 bg-daun-600/90 px-3 py-1 font-body text-xs font-semibold text-white shadow-soft backdrop-blur-sm">
+                      <Sparkles size={12}/>
                       {dict.menu.baru}
                     </span>
                   )}
@@ -176,7 +214,8 @@ export function MenuSection() {
                   </span>
                 </div>
                 {m.promo && (
-                  <span className="inline-flex shrink-0 items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-1 font-body text-[11px] font-bold text-red-600 shadow-sm">
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-red-200 bg-gradient-to-r from-red-50 to-orange-50 px-2.5 py-1 font-body text-[11px] font-bold text-red-600 shadow-sm">
+                    <BadgePercent size={12}/>
                     Hemat {m.promo}%
                   </span>
                 )}
@@ -187,7 +226,7 @@ export function MenuSection() {
     };
 
     return (<section id="menu" className="bg-krem-50 py-20">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{dict.menu.title}</p>
           <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{dict.menu.subtitle}</h2>
@@ -200,7 +239,17 @@ export function MenuSection() {
         )         : menuItems.length === 0 ? (<p className="py-10 text-center font-body text-daun-500">Menu belum tersedia.</p>) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {featuredItems.length > 0 && (
-              <MenuCategoryCard title="Recommended & Promo" items={featuredItems} onClick={() => setShowFeatured(true)} accent staggerDelay={0} />
+              <MenuCategoryCard
+                title="Recommended & Promo"
+                items={featuredItems}
+                onClick={() => setShowFeatured(true)}
+                accent
+                staggerDelay={0}
+                badges={[
+                  ...(featuredItems.some((item) => item.isRecommended) ? [{ type: 'recommended', label: dict.menu.recommended }] : []),
+                  ...(featuredItems.some((item) => item.promo) ? [{ type: 'promo', label: 'Promo' }] : []),
+                ]}
+              />
             )}
             {packageItems.length > 0 && (
               <MenuCategoryCard title={lang === 'id' ? 'Paket Makanan' : 'Meal Packages'} items={packageItems} onClick={() => setShowPackages(true)} staggerDelay={1300} />

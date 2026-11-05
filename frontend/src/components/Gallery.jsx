@@ -12,13 +12,10 @@ const fallbackGallery = galleryImages.map((item, index) => ({
     src: item.src,
     alt: item.alt,
 }));
-const MAX_VISIBLE_ITEMS = 11;
-
 export function Gallery() {
     const { dict } = useLang();
     const [items, setItems] = useState(fallbackGallery);
     const [categoryIndex, setCategoryIndex] = useState(0);
-    const [galleryPage, setGalleryPage] = useState(0);
     const [lightbox, setLightbox] = useState(null);
     const categories = [
         { id: 'moments', label: 'Momen di Alas Daun' },
@@ -27,17 +24,12 @@ export function Gallery() {
     ];
     const activeCategory = categories[categoryIndex];
     const visibleItems = items.filter((item) => item.category === activeCategory.id);
-    const pageCount = Math.ceil(visibleItems.length / MAX_VISIBLE_ITEMS);
-    const displayedItems = visibleItems.slice(
-        galleryPage * MAX_VISIBLE_ITEMS,
-        (galleryPage + 1) * MAX_VISIBLE_ITEMS,
-    );
+    const displayedItems = visibleItems;
     const close = useCallback(() => setLightbox(null), []);
     const next = useCallback(() => setLightbox((p) => (p === null || !displayedItems.length ? null : (p + 1) % displayedItems.length)), [displayedItems.length]);
     const prev = useCallback(() => setLightbox((p) => (p === null || !displayedItems.length ? null : (p - 1 + displayedItems.length) % displayedItems.length)), [displayedItems.length]);
     const changeCategory = (direction) => {
         setCategoryIndex((current) => (current + direction + categories.length) % categories.length);
-        setGalleryPage(0);
         setLightbox(null);
     };
     useEffect(() => {
@@ -46,21 +38,12 @@ export function Gallery() {
                 setItems(result.data.length
                     ? result.data.map((item) => ({ ...item, category: item.category || 'moments' }))
                     : fallbackGallery);
-                setGalleryPage(0);
             })
             .catch(() => {});
     }, []);
     useEffect(() => {
-        setGalleryPage(0);
         setLightbox(null);
     }, [categoryIndex]);
-    useEffect(() => {
-        if (pageCount <= 1 || lightbox !== null) return undefined;
-        const timer = window.setInterval(() => {
-            setGalleryPage((current) => (current + 1) % pageCount);
-        }, 4000);
-        return () => window.clearInterval(timer);
-    }, [pageCount, lightbox]);
     useEffect(() => {
         if (lightbox === null)
             return;
@@ -80,7 +63,7 @@ export function Gallery() {
         };
     }, [lightbox, close, next, prev]);
     return (<section id="galeri" className="bg-krem-100 py-20">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{dict.gallery.title}</p>
           <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{dict.gallery.subtitle}</h2>
@@ -89,15 +72,15 @@ export function Gallery() {
 
         <div className="mb-8 flex items-center justify-center gap-4">
           <button type="button" onClick={() => changeCategory(-1)} aria-label="Kategori sebelumnya" className="rounded-full border-2 border-daun-400 px-4 py-2 text-2xl leading-none text-daun-600 transition hover:bg-daun-500 hover:text-white">‹</button>
-          <div className="min-w-52 text-center">
+          <div className="min-w-0 flex-1 text-center sm:min-w-52 sm:flex-none">
             <p className="font-heading text-2xl font-bold text-daun-700">{activeCategory.label}</p>
             <p className="mt-1 text-xs uppercase tracking-widest text-daun-500">{categoryIndex + 1} / {categories.length}</p>
           </div>
           <button type="button" onClick={() => changeCategory(1)} aria-label="Kategori berikutnya" className="rounded-full border-2 border-daun-400 px-4 py-2 text-2xl leading-none text-daun-600 transition hover:bg-daun-500 hover:text-white">›</button>
         </div>
 
-        <div key={galleryPage} className="masonry-grid gallery-page-transition">
-          {displayedItems.length ? displayedItems.map((item, i) => (<button key={item.id} style={{ '--gallery-item-delay': `${Math.min(i, 10) * 55}ms` }} onClick={() => setLightbox(i)} className="masonry-item group relative block w-full overflow-hidden rounded-2xl bg-krem-50 shadow-soft transition-all duration-500 hover:shadow-card focus:outline-none focus:ring-2 focus:ring-oranye-400">
+        <div className="masonry-grid">
+          {displayedItems.length ? displayedItems.map((item, i) => (<button key={item.id} onClick={() => setLightbox(i)} className="masonry-item group relative block w-full overflow-hidden rounded-2xl bg-krem-50 shadow-soft transition-all duration-300 hover:shadow-card focus:outline-none focus:ring-2 focus:ring-oranye-400">
               {item.type === 'video' ? <video src={item.src} aria-label={item.alt} muted playsInline preload="metadata" className="w-full transition-transform duration-700 group-hover:scale-105" /> : <img src={item.src} alt={item.alt} loading="lazy" className="w-full transition-transform duration-700 group-hover:scale-105"/>}
               {item.type === 'video' && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-daun-900/70 p-3 text-white"><Play size={22} fill="currentColor" /></span>}
               <div className="absolute inset-0 bg-daun-900/0 transition-colors duration-300 group-hover:bg-daun-900/20"/>
