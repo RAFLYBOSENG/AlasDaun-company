@@ -7,7 +7,7 @@ const directionsUrl = 'https://www.google.com/maps/dir/?api=1&destination=Alas+D
 export function LocationMap() {
     const { lang, dict } = useLang();
     return (<section id="lokasi" className="bg-krem-100 py-20">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{dict.location.title}</p>
           <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{dict.location.title}</h2>

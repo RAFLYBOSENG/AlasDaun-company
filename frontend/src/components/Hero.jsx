@@ -18,7 +18,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(14,27,17,0.6)_100%)]"/>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-32 text-center">
+      <div className="relative z-10 mx-auto w-full max-w-4xl px-4 py-24 text-center sm:px-6 sm:py-32">
         {/* Open/Closed badge */}
         <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-krem-100/15 px-4 py-1.5 backdrop-blur-sm ring-1 ring-krem-100/30">
           <span className={`relative flex h-2.5 w-2.5`}>
@@ -35,7 +35,7 @@ export function Hero() {
         {/* Sundanese greeting */}
         <p className="mb-3 font-heading text-lg italic text-oranye-300 animate-fade-in">{dict.hero.sit}</p>
 
-        <h1 className="mb-4 font-heading text-4xl font-bold leading-tight text-krem-100 drop-shadow-lg sm:text-5xl md:text-6xl lg:text-7xl animate-fade-up">
+        <h1 className="mb-4 font-heading text-[2.25rem] font-bold leading-[1.08] text-krem-100 drop-shadow-lg sm:text-5xl md:text-6xl lg:text-7xl animate-fade-up">
           {dict.hero.greeting}
         </h1>
 

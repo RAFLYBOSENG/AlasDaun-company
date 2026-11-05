@@ -2,7 +2,7 @@ import { useLang } from '../lib/language-context';
 export function About() {
     const { lang, dict } = useLang();
     return (<section id="tentang" className="bg-krem-50 py-20">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Image */}
           <div className="relative order-2 lg:order-1">

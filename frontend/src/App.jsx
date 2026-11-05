@@ -11,8 +11,9 @@ import { Testimonials } from './components/Testimonials';
 import { LocationMap } from './components/LocationMap';
 import { Footer } from './components/Footer';
 import { AnimatedSection } from './components/AnimatedSection';
+import { LinkInBio } from './components/LinkInBio';
 function MainSite() {
-    return (<>
+    return (<div className="min-w-0 overflow-x-hidden">
       <Navbar />
       <main>
         <AnimatedSection><Hero /></AnimatedSection>
@@ -24,9 +25,13 @@ function MainSite() {
         <AnimatedSection><LocationMap /></AnimatedSection>
       </main>
       <AnimatedSection><Footer /></AnimatedSection>
-    </>);
+    </div>);
 }
 function App() {
+    const [isLinkInBio, setIsLinkInBio] = useState(() => (
+        window.location.pathname === '/links'
+        || /^#\/?links(?:$|\/)/.test(window.location.hash)
+    ));
     const [isAdmin, setIsAdmin] = useState(() => {
         return window.location.pathname === '/admin' || /^#\/?admin(?:$|\/)/.test(window.location.hash);
     });
@@ -34,6 +39,7 @@ function App() {
     useEffect(() => {
         const updateRoute = () => {
             setIsAdmin(window.location.pathname === '/admin' || /^#\/?admin(?:$|\/)/.test(window.location.hash));
+            setIsLinkInBio(window.location.pathname === '/links' || /^#\/?links(?:$|\/)/.test(window.location.hash));
         };
         window.addEventListener('hashchange', updateRoute);
         window.addEventListener('popstate', updateRoute);
@@ -44,7 +50,7 @@ function App() {
     }, []);
 
     return (<LanguageProvider>
-      {isAdmin ? <Admin /> : <MainSite />}
+      {isAdmin ? <Admin /> : isLinkInBio ? <LinkInBio /> : <MainSite />}
     </LanguageProvider>);
 }
 export default App;
