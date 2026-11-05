@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowDown, ArrowUp, ArrowUpDown, Leaf, LogOut, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { ArrowLeft, ArrowDown, ArrowUp, ArrowUpDown, LogOut, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { apiRequest } from '../lib/api';
 import { GalleryAdmin } from './GalleryAdmin';
 import { TestimonialsAdmin } from './TestimonialsAdmin';
@@ -378,8 +378,8 @@ export function Admin() {
         className="flex min-h-screen w-full items-center justify-center overflow-x-hidden bg-krem-50 px-5 py-12"
       >
         <form onSubmit={handleLogin} className="w-full max-w-md rounded-2xl bg-white p-8 shadow-card">
-          <a href="/" className="mb-7 inline-flex items-center gap-2 font-heading text-xl font-bold text-daun-600">
-            <Leaf size={22} /> Alas Daun
+          <a href="/" className="mb-7 inline-flex items-center" aria-label="Alas Daun">
+            <img src="/logo-alas-daun.png" alt="Alas Daun" className="h-14 w-auto object-contain" />
           </a>
           <h1 className="mb-2 font-heading text-2xl font-bold text-daun-700">Login Admin</h1>
           <p className="mb-6 text-sm text-daun-600">Masuk untuk mengelola daftar menu.</p>

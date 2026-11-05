@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Leaf } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useLang } from '../lib/language-context';
 export function Navbar() {
     const { lang, dict, toggle } = useLang();
@@ -28,13 +28,8 @@ export function Navbar() {
         : 'lg:border lg:border-krem-100/20 lg:bg-daun-900/35 lg:text-krem-50 lg:backdrop-blur-sm';
     return (<header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-krem-50 shadow-soft' : 'bg-krem-50 shadow-soft lg:bg-transparent lg:shadow-none'}`}>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <button onClick={() => handleNav('#beranda')} className={`flex items-center gap-2 rounded-full transition ${scrolled ? 'bg-krem-50 py-1 pl-1 pr-3' : ''}`}>
-          <span className={`flex h-9 w-9 items-center justify-center rounded-full bg-daun-500 text-krem-100 transition ${scrolled ? '' : 'lg:ring-2 lg:ring-krem-100/40'}`}>
-            <Leaf size={18}/>
-          </span>
-          <span className={`font-heading text-lg font-bold leading-none ${scrolled ? 'text-daun-600' : 'text-daun-600 lg:text-krem-50 lg:drop-shadow'}`}>
-            Alas Daun
-          </span>
+        <button onClick={() => handleNav('#beranda')} className="flex items-center rounded-lg transition" aria-label="Alas Daun - kembali ke beranda">
+          <img src="/logo-alas-daun.png" alt="Alas Daun" className="h-12 w-auto max-w-48 object-contain sm:h-14" />
         </button>
 
         {/* Desktop */}

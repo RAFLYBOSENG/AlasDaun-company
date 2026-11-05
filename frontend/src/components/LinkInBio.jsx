@@ -3,7 +3,6 @@ import {
   Facebook,
   Globe2,
   Instagram,
-  Leaf,
   MessageCircle,
   Search,
   ShoppingBag,
@@ -128,20 +127,14 @@ export function LinkInBio() {
 
       <main className="z-0 flex w-full max-w-md flex-col items-center px-6 py-10">
         <header className="mb-8 flex w-full flex-col items-center text-center">
-          <div className="group relative mb-4">
+          <div className="mb-4">
             <img
-              src="https://images.unsplash.com/photo-1549488344-c5a45293297a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-              alt="Hidangan Alas Daun"
-              className="h-28 w-28 rounded-full border-4 border-daun-700 object-cover shadow-xl transition duration-500 group-hover:rotate-3 group-hover:scale-105"
+              src="/logo-alas-daun.png"
+              alt="Logo Alas Daun"
+              className="h-24 w-auto max-w-64 object-contain sm:h-28"
             />
-            <span className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-krem-50 bg-oranye-500 text-white shadow-md">
-              <Leaf size={16} aria-hidden="true" />
-            </span>
           </div>
-          <h1 className="mb-1 font-heading text-3xl font-bold tracking-wide text-daun-700">
-            Alas Daun
-          </h1>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-daun-500">
+          <p className="mt-2 text-sm font-medium uppercase tracking-[0.2em] text-daun-500">
             Wilujeng Sumping
           </p>
         </header>
