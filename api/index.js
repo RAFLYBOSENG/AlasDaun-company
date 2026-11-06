@@ -2,7 +2,7 @@ import express from 'express';
 import { config } from 'dotenv';
 import { dispatchApiRoute } from '../backend/routes/api-routes.js';
 
-config();
+config({ path: ['backend/.env', '.env'] });
 
 const app = express();
 const frontendOrigin = process.env.FRONTEND_ORIGIN || '*';
