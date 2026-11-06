@@ -29,17 +29,31 @@ database dan `/#/admin` untuk login serta mengelolanya. Panduan database lengkap
 
 ## Deploy ke Vercel
 
-Import repository ini ke Vercel tanpa mengubah Root Directory. Konfigurasi
-[`../vercel.json`](../vercel.json) akan membangun `frontend/dist` dan
-mengarahkan `/api/*` ke function serverless.
+1. Import repository ini ke Vercel dengan **Root Directory** tetap di root
+   repository (jangan memilih `frontend`).
+2. Vercel akan memakai konfigurasi [`../vercel.json`](../vercel.json):
+   build frontend ke `frontend/dist` dan menjalankan folder `api/` sebagai
+   serverless function.
+3. Tambahkan environment variables berikut di Vercel untuk environment yang
+   digunakan (Production, Preview, atau Development):
 
-Tambahkan environment variables berikut di pengaturan project Vercel:
+   - `DATABASE_URL` — connection string Neon
+   - `SESSION_SECRET` — secret acak minimal 32 karakter
+   - `ADMIN_EMAIL` — email admin awal
+   - `ADMIN_PASSWORD` — password admin awal minimal 12 karakter
 
-- `DATABASE_URL`
-- `SESSION_SECRET` (minimal 32 karakter)
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
+4. Jalankan seluruh schema SQL di Neon sebelum membuka halaman admin. Setelah
+   deployment pertama, buat akun admin dengan menjalankan provisioning dari
+   lingkungan lokal yang memiliki environment variables yang sama:
 
-Jalankan schema Neon dan buat admin sebelum memakai halaman admin. Upload
-gambar di Vercel disimpan sebagai data URL di database karena filesystem
-serverless tidak persisten.
+   ```bash
+   cd backend
+   npm install
+   npm run admin:create
+   npm run menu:seed
+   ```
+
+   Jangan menambahkan file `.env` ke Git atau menyalin nilainya ke source code.
+   Gunakan Vercel Project Settings untuk menyimpan secret production.
+5. Upload gambar dan media di Vercel disimpan sebagai data URL di database
+   karena filesystem serverless tidak persisten.

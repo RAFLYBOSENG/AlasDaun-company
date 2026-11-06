@@ -50,7 +50,7 @@ export const restaurantInfo = {
     email: 'admin@alasdaun.com',
     instagram: 'alas.daun',
     facebook: 'AlasDaunBdg',
-    youtubeVideoId: 'dQw4w9WgXcQ', // placeholder — ganti dengan ID video profil Alas Daun
+    youtubeVideoId: 'Du9jdliX9Zk',
     // [jam buka: 10.00-21.00] — placeholder jam operasional, ganti setelah dikonfirmasi
     openHour: 10,
     closeHour: 21,

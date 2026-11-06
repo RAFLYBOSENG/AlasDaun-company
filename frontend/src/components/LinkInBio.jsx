@@ -93,7 +93,9 @@ export function LinkInBio() {
       icon: Instagram,
       href: `https://instagram.com/${restaurantInfo.instagram}`,
     },
-    { label: 'YouTube', icon: Youtube, href: '' },
+    { label: 'YouTube',
+      icon: Youtube,
+      href: 'https://youtu.be/Du9jdliX9Zk' },
     {
       label: 'Google',
       icon: Search,

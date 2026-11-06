@@ -4,11 +4,28 @@ export function About() {
     return (<section id="tentang" className="bg-krem-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
-          {/* Image */}
+          {/* video */}
           <div className="relative order-2 lg:order-1">
             <div className="relative overflow-hidden rounded-3xl shadow-card">
-              <img src="https://images.pexels.com/photos/37090679/pexels-photo-37090679.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Suasana rumah makan Alas Daun dengan hidangan di meja kayu" loading="lazy" className="h-full w-full object-cover"/>
-              <div className="absolute inset-0 bg-gradient-to-t from-daun-900/40 to-transparent"/>
+              <video
+                src="../public/vidaboutus/alasdaun.mp4"
+                title="Video suasana rumah makan Alas Daun"
+                controls
+                autoPlay
+                muted
+                playsInline
+                preload="metadata"
+                className="aspect-video h-full min-h-[320px] w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-daun-900/40 to-transparent"/>
+              <a
+                href="https://youtu.be/Du9jdliX9Zk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-3 right-3 rounded-full bg-daun-900/75 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-daun-900"
+              >
+                Buka di YouTube
+              </a>
             </div>
             {/* Decorative leaf accent */}
             <div className="absolute -left-4 -top-4 -z-10 h-32 w-32 rounded-full bg-daun-200/40 blur-2xl"/>

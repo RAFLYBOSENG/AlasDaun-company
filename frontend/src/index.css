@@ -166,9 +166,85 @@ n8n-chat:hover {
 .menu-horizontal-scroll::-webkit-scrollbar { height: 6px; }
 
 /* Masonry */
+.gallery-swipe-surface {
+  touch-action: pan-y;
+}
 .masonry-grid {
   column-gap: 1rem;
+  column-count: 2;
+}
+.masonry-item {
+  width: 100%;
+  margin-bottom: 0.75rem;
 }
 @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
 @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
-.masonry-item { break-inside: avoid; margin-bottom: 1rem; }
+@media (min-width: 640px) {
+  .masonry-item { margin-bottom: 1rem; }
+}
+
+@keyframes gallery-page-slide-next {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translate3d(2rem, 0, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes gallery-page-slide-previous {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translate3d(-2rem, 0, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.gallery-page-transition-next,
+.gallery-page-transition-previous {
+  animation-duration: 1000ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  will-change: opacity, filter, transform;
+  perspective: 1200px;
+}
+.gallery-page-transition-next { animation-name: gallery-page-slide-next; }
+.gallery-page-transition-previous { animation-name: gallery-page-slide-previous; }
+
+@keyframes gallery-item-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.gallery-item-reveal {
+  opacity: 0;
+  animation: gallery-item-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(120ms + (var(--gallery-item-index) * 45ms));
+  will-change: opacity, transform;
+}
+.gallery-page-transition-next .gallery-item-reveal,
+.gallery-page-transition-previous .gallery-item-reveal {
+  animation-delay: calc(180ms + (var(--gallery-item-index) * 45ms));
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-page-transition-next,
+  .gallery-page-transition-previous,
+  .gallery-item-reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
