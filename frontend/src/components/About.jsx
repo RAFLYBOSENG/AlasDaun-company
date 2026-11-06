@@ -8,7 +8,7 @@ export function About() {
           <div className="relative order-2 lg:order-1">
             <div className="relative overflow-hidden rounded-3xl shadow-card">
               <video
-                src="../public/vidaboutus/alasdaun.mp4"
+                src="/vidaboutus/alasdaun.mp4"
                 title="Video suasana rumah makan Alas Daun"
                 controls
                 autoPlay
