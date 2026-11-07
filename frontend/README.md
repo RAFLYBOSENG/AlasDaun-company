@@ -29,17 +29,59 @@ database dan `/#/admin` untuk login serta mengelolanya. Panduan database lengkap
 
 ## Deploy ke Vercel
 
-Import repository ini ke Vercel tanpa mengubah Root Directory. Konfigurasi
-[`../vercel.json`](../vercel.json) akan membangun `frontend/dist` dan
-mengarahkan `/api/*` ke function serverless.
+1. Import repository ini ke Vercel dengan **Root Directory** tetap di root
+   repository (jangan memilih `frontend`).
+2. Vercel akan memakai konfigurasi [`../vercel.json`](../vercel.json):
+   build frontend ke `frontend/dist` dan menjalankan folder `api/` sebagai
+   serverless function.
+3. Tambahkan environment variables berikut di Vercel untuk environment yang
+   digunakan (Production, Preview, atau Development):
 
-Tambahkan environment variables berikut di pengaturan project Vercel:
+   - `DATABASE_URL` — connection string Neon
+   - `SESSION_SECRET` — secret acak minimal 32 karakter
+   - `ADMIN_EMAIL` — email admin awal
+   - `ADMIN_PASSWORD` — password admin awal minimal 12 karakter
 
-- `DATABASE_URL`
-- `SESSION_SECRET` (minimal 32 karakter)
+4. Jalankan seluruh schema SQL di Neon sebelum membuka halaman admin. Setelah
+   deployment pertama, buat akun admin dengan menjalankan provisioning dari
+   lingkungan lokal yang memiliki environment variables yang sama:
+
+   ```bash
+   cd backend
+   npm install
+   npm run admin:create
+   npm run menu:seed
+   ```
+
+   Jangan menambahkan file `.env` ke Git atau menyalin nilainya ke source code.
+   Gunakan Vercel Project Settings untuk menyimpan secret production.
+5. Upload gambar dan media di Vercel disimpan sebagai data URL di database
+   karena filesystem serverless tidak persisten.
+
+### Troubleshooting koneksi database di Vercel
+
+`backend/.env` hanya digunakan untuk development lokal dan tidak dikirim ke
+Vercel. Di Vercel buka **Project Settings > Environment Variables**, lalu
+tambahkan variabel berikut pada environment yang sedang dideploy:
+
+- `DATABASE_URL` — connection string lengkap dari Neon, termasuk
+  `sslmode=require`
+- `SESSION_SECRET` — secret acak minimal 32 karakter
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 
-Jalankan schema Neon dan buat admin sebelum memakai halaman admin. Upload
-gambar di Vercel disimpan sebagai data URL di database karena filesystem
-serverless tidak persisten.
+Pastikan variabel ditambahkan ke **Production** bila yang dibuka adalah URL
+production, atau ke **Preview** bila menguji deployment preview. Setelah
+menyimpan perubahan, lakukan redeploy karena environment variables hanya
+tersedia pada deployment baru.
+
+Tes endpoint `https://domain-anda.vercel.app/api/health/db`. Jika responsnya
+`DATABASE_URL is not configured`, variabel belum tersedia pada environment
+deployment. Jika responsnya `Terjadi kesalahan pada server`, buka **Vercel
+Dashboard > Deployments > deployment > Functions > api/index.js > Logs** untuk
+melihat error koneksi atau schema dari Neon.
+
+Jika health check berhasil tetapi browser melaporkan error CORS, jangan isi
+`FRONTEND_ORIGIN` dengan `http://localhost:5173` pada environment Vercel.
+Hapus variabel tersebut untuk deployment same-origin, atau isi dengan URL
+frontend Vercel yang sebenarnya.
