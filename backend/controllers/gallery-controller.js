@@ -2,7 +2,13 @@ import { getPool } from '../database.js';
 import { isAdminRequest } from './auth-controller.js';
 
 const MAX_MEDIA_BYTES = 3 * 1024 * 1024;
-const GALLERY_CATEGORIES = ['moments', 'place', 'facilities'];
+const GALLERY_CATEGORIES = ['momen_di_alas_daun', 'tempat_di_alas_daun', 'behind_the_scene'];
+const LEGACY_CATEGORY = {
+  moments: 'momen_di_alas_daun',
+  place: 'tempat_di_alas_daun',
+  facilities: 'behind_the_scene',
+  'behind-scenes': 'behind_the_scene',
+};
 const MEDIA_TYPES = {
   'image/jpeg': { type: 'image', matches: (data) => data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff },
   'image/png': { type: 'image', matches: (data) => data.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) },
@@ -20,7 +26,7 @@ function response(status, body) {
 function normalize(row) {
   return {
     id: row.id,
-    category: row.category,
+    category: LEGACY_CATEGORY[String(row.category)] || String(row.category),
     type: row.mediaType,
     src: row.mediaUrl,
     alt: row.altText,
