@@ -1,9 +1,25 @@
 -- Alas Daun - Neon schema for editable gallery media
 -- Run this file in the Neon SQL Editor after the existing schema.
 
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type
+    WHERE typname = 'gallery_category'
+      AND typnamespace = 'public'::regnamespace
+  ) THEN
+    CREATE TYPE public.gallery_category AS ENUM (
+      'momen_di_alas_daun',
+      'tempat_di_alas_daun',
+      'behind_the_scene'
+    );
+  END IF;
+END
+$$;
+
 CREATE TABLE IF NOT EXISTS gallery_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  category text NOT NULL DEFAULT 'moments' CHECK (category IN ('moments', 'place', 'facilities')),
+  category public.gallery_category NOT NULL DEFAULT 'momen_di_alas_daun',
   media_type text NOT NULL CHECK (media_type IN ('image', 'video')),
   media_url text NOT NULL CHECK (
     media_url ~ '^https?://'
