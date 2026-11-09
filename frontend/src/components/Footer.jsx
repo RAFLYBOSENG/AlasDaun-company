@@ -86,7 +86,7 @@ export function Footer() {
       <div className="border-t border-daun-800">
         <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
           <p className="text-center font-body text-xs text-krem-100/50">
-            &copy; {year} Rumah Makan Alas Daun. {dict.footer.rights}.
+            &copy; {year} Tim Developer OJT Alas Daun (Illyas &amp; Rafly). All Rights Reserved.
           </p>
         </div>
       </div>

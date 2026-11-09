@@ -19,7 +19,7 @@ export function AnimatedSection({ children, delay = 0 }) {
         setIsVisible(true);
         observer.unobserve(entry.target);
       }
-    }, { threshold: 0.15 });
+    }, { threshold: 0.05, rootMargin: '0px 0px -5% 0px' });
 
     observer.observe(section);
     return () => observer.disconnect();

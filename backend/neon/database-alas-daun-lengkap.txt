@@ -1,0 +1,225 @@
+-- DATABASE LENGKAP ALAS DAUN
+-- Jalankan seluruh query ini pada database PostgreSQL baru (contoh: Neon).
+-- File ini sengaja berformat .txt.
+
+-- Bagian 1: Tabel admin dan menu
+-- Alas Daun - Neon PostgreSQL schema
+-- Run this file in the Neon SQL Editor or with:
+-- psql "$DATABASE_URL" -f neon/schema.sql
+--
+-- Keep DATABASE_URL on the backend. Never expose it as a VITE_* variable
+-- because the Vite bundle is public.
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE IF NOT EXISTS admins (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text NOT NULL,
+  password_hash text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT admins_email_not_empty CHECK (char_length(btrim(email)) BETWEEN 3 AND 254)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS admins_email_lower_idx
+  ON admins (lower(email));
+
+CREATE TABLE IF NOT EXISTS menu_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL CHECK (char_length(btrim(name)) BETWEEN 1 AND 120),
+  category text NOT NULL CHECK (category ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+  price integer NOT NULL CHECK (price > 0),
+  description_id text NOT NULL CHECK (char_length(btrim(description_id)) BETWEEN 1 AND 1000),
+  description_en text NOT NULL CHECK (char_length(btrim(description_en)) BETWEEN 1 AND 1000),
+  image_url text NOT NULL CONSTRAINT menu_items_image_url_check
+    CHECK (image_url ~ '^https?://' OR image_url ~ '^/asset/images/menu/[0-9a-f-]+\.(jpg|png|webp|gif)$'
+      OR image_url ~ '^data:image/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$'),
+  is_recommended boolean NOT NULL DEFAULT false,
+  is_new boolean NOT NULL DEFAULT false,
+  promo integer CHECK (promo IS NULL OR promo BETWEEN 1 AND 99),
+  is_active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0 CHECK (sort_order >= 0),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS menu_items_public_order_idx
+  ON menu_items (is_active, sort_order, name);
+
+CREATE OR REPLACE FUNCTION set_menu_items_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS menu_items_set_updated_at ON menu_items;
+
+CREATE TRIGGER menu_items_set_updated_at
+BEFORE UPDATE ON menu_items
+FOR EACH ROW
+EXECUTE FUNCTION set_menu_items_updated_at();
+
+-- Data awal menu
+INSERT INTO public.menu_items
+  (name, category, price, description_id, description_en, image_url,
+   is_recommended, is_new, promo, sort_order)
+VALUES
+  ('Paket Ayam Goreng Santan', 'paket-makanan', 72000, 'Ayam goreng berkuah santan kental, disajikan di atas daun pisang dengan nasi hangat dan sambal dadak.', 'Fried chicken in rich coconut gravy, served on banana leaf with warm rice and fresh chili paste.', 'https://images.pexels.com/photos/36853606/pexels-photo-36853606.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', true, false, NULL, 0),
+  ('Paket Ayam Kecap', 'paket-makanan', 72000, 'Ayam kampung empuk dimasak kecap manis dengan bumbu rempah khas Sunda, manis gurih berpadat rasa.', 'Tender village chicken slow-cooked in sweet soy sauce with traditional Sundanese spices.', 'https://images.pexels.com/photos/37002428/pexels-photo-37002428.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 1),
+  ('Paket Ayam Kampung', 'paket-makanan', 98000, 'Ayam kampung asli dengan tekstur padat dan rasa gurih, digoreng kering dan disajikan bersama lalapan.', 'Authentic free-range chicken with firm texture and savory taste, fried and served with fresh greens.', 'https://images.pexels.com/photos/28041446/pexels-photo-28041446.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', true, false, NULL, 2),
+  ('Paket Bebek', 'paket-makanan', 124000, 'Bebek empuk berbumbu rempah pilihan, digoreng hingga kulitnya garing, dagingnya tetap lembut di mulut.', 'Tender duck marinated in select spices, fried until skin crisps while meat stays melt-in-mouth soft.', 'https://images.pexels.com/photos/37211465/pexels-photo-37211465.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, 10, 3),
+  ('Paket Gepuk', 'paket-makanan', 76000, 'Daging sapi gepuk yang digepung tipis, goreng renyah di luar namun tetap juicy, bumbu meresap hingga ke dalam.', 'Thinly pounded beef, crisp outside yet juicy inside, spices soaked through every fiber.', 'https://images.pexels.com/photos/37081070/pexels-photo-37081070.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 4),
+  ('Paket Usus Sapi', 'jeroan', 66000, 'Usus sapi dimasak dengan bumbu rempah kental, tekstur kenyal khas dengan rasa yang dalam.', 'Beef intestine cooked in thick spiced gravy, signature chewy texture with deep flavor.', 'https://images.pexels.com/photos/37052499/pexels-photo-37052499.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 5),
+  ('Paket Bandeng', 'lauk-ikan', 55000, 'Bandeng goreng kering dengan duri yang sudah lunak, gurih dan renyah, cocok dimakan bersama nasi panas.', 'Crispy fried milkfish with softened bones, savory and crunchy, perfect with hot rice.', 'https://images.pexels.com/photos/6872197/pexels-photo-6872197.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 6),
+  ('Paket Barakuda', 'lauk-ikan', 70000, 'Ikan barakuda dibakar dengan bumbu kuning, dagingnya tebal dan padat, disajikan dengan sambal dabu-dabu.', 'Grilled barracuda with yellow spice, thick firm meat served with dabu-dabu chili.', 'https://images.pexels.com/photos/8352777/pexels-photo-8352777.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 7),
+  ('Paket Gurame', 'lauk-ikan', 50000, 'Gurame goreng kering, kulit renyah dan daging tebal manis, favorit keluarga sejak dulu.', 'Crispy fried gurame, crunchy skin and sweet thick meat, a long-time family favorite.', 'https://images.pexels.com/photos/6872121/pexels-photo-6872121.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', true, false, NULL, 8),
+  ('Paket Ikan Baronang', 'lauk-ikan', 80000, 'Ikan baronang dibakar sempurna, daging lembut dengan rasa manis alami laut, disajikan dengan sambal kecap.', 'Perfectly grilled rabbitfish, soft meat with natural ocean sweetness, served with soy chili.', 'https://images.pexels.com/photos/6872187/pexels-photo-6872187.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 9),
+  ('Paket Nila Merah', 'lauk-ikan', 70000, 'Nila merah digoreng dengan bumbu bawang putih, daging putih lembut, disajikan dengan lalapan segar.', 'Red tilapia fried with garlic spice, tender white meat served with fresh greens.', 'https://images.pexels.com/photos/6872124/pexels-photo-6872124.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 10),
+  ('Ayam Bambu', 'lauk-ayam-bebek', 88000, 'Ayam utuh dibakar dalam batang bambu, asap memberi aroma kayu khas, daging juicy dan haraf rempah.', 'Whole chicken roasted inside bamboo, smoke lends a woody aroma, juicy meat fragrant with spice.', 'https://images.pexels.com/photos/37048512/pexels-photo-37048512.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, true, NULL, 11),
+  ('Bebek Bambu', 'lauk-ayam-bebek', 115000, 'Bebek dimarinasi bumbu pedas lalu dibakar dalam bambu, aroma dan keempukan dagingnya tidak biasa.', 'Duck marinated in spicy paste then roasted in bamboo, remarkable aroma and tenderness.', 'https://images.pexels.com/photos/37106136/pexels-photo-37106136.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, true, NULL, 12),
+  ('Es Pandawa', 'minuman', 25000, 'Minuman segar perpaduan kelapa muda, kolang-kiling, dan sirup pandan, manis sejuk menyegarkan.', 'Refreshing blend of young coconut, kolang-kiling, and pandan syrup, sweet and cooling.', 'https://images.pexels.com/photos/11015772/pexels-photo-11015772.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, true, NULL, 13),
+  ('Es Teh Manis', 'minuman', 10000, 'Teh manis dingin klasik, pelengkap sempurna untuk makan pedas beralas daun.', 'Classic iced sweet tea, the perfect companion to a spicy banana-leaf meal.', 'https://images.pexels.com/photos/32612248/pexels-photo-32612248.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 14),
+  ('Es Jeruk', 'minuman', 12000, 'Jeruk peras segar dengan es batu, asam manis menyegarkan untuk menetralisir rasa pedas.', 'Freshly squeezed orange with ice, sweet-tart refreshment to balance the heat.', 'https://images.pexels.com/photos/39508622/pexels-photo-39508622.png?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 15),
+  ('Kacang Roay', 'oleh-oleh', 35000, 'Kacang tanah sangrai dengan bumbu pedas manis, camilan klasik yang sukar ditolak.', 'Roasted peanuts with sweet-spicy seasoning, an irresistible classic snack.', 'https://images.pexels.com/photos/36848881/pexels-photo-36848881.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 16),
+  ('Paket Nasi Liwet', 'paket-makanan', 68000, 'Nasi liwet gurih dengan ayam suwir, tahu, tempe, dan sambal, disajikan hangat di atas daun pisang.', 'Savory rice served with shredded chicken, tofu, tempeh, and chili paste on a banana leaf.', 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 17),
+  ('Paket Ayam Bakar Madu', 'lauk-ayam-bebek', 78000, 'Ayam bakar berbumbu rempah dengan olesan madu, disajikan bersama nasi, lalapan, dan sambal.', 'Spiced grilled chicken glazed with honey, served with rice, fresh vegetables, and chili paste.', 'https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, true, NULL, 18),
+  ('Sayur Asem', 'paket-makanan', 18000, 'Sayur asem segar dengan jagung, kacang panjang, dan labu, bercita rasa asam gurih khas rumahan.', 'A refreshing tamarind vegetable soup with corn, long beans, and squash.', 'https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', false, false, NULL, 19);
+
+-- Bagian 2: Tabel dan data galeri
+-- Alas Daun - Neon schema for editable gallery media
+-- Run this file in the Neon SQL Editor after the existing schema.
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type
+    WHERE typname = 'gallery_category'
+      AND typnamespace = 'public'::regnamespace
+  ) THEN
+    CREATE TYPE public.gallery_category AS ENUM (
+      'momen_di_alas_daun',
+      'tempat_di_alas_daun',
+      'behind_the_scene'
+    );
+  END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS gallery_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  category public.gallery_category NOT NULL DEFAULT 'momen_di_alas_daun',
+  media_type text NOT NULL CHECK (media_type IN ('image', 'video')),
+  media_url text NOT NULL CHECK (
+    media_url ~ '^https?://'
+    OR media_url ~ '^data:(image|video)/(jpeg|png|webp|gif|mp4|webm|ogg);base64,[A-Za-z0-9+/]+=*$'
+  ),
+  alt_text text NOT NULL CHECK (char_length(btrim(alt_text)) BETWEEN 1 AND 160),
+  sort_order integer NOT NULL DEFAULT 0 CHECK (sort_order >= 0),
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS gallery_items_public_order_idx
+  ON gallery_items (is_active, sort_order, created_at);
+
+DROP INDEX IF EXISTS gallery_items_media_url_idx;
+
+CREATE UNIQUE INDEX gallery_items_media_url_idx
+  ON gallery_items (md5(media_url));
+
+CREATE OR REPLACE FUNCTION set_gallery_items_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS gallery_items_set_updated_at ON gallery_items;
+
+CREATE TRIGGER gallery_items_set_updated_at
+BEFORE UPDATE ON gallery_items
+FOR EACH ROW
+EXECUTE FUNCTION set_gallery_items_updated_at();
+
+INSERT INTO gallery_items (media_type, media_url, alt_text, sort_order)
+VALUES
+  ('image', 'https://images.pexels.com/photos/37303212/pexels-photo-37303212.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Hidangan lengkap di atas daun pisang', 0),
+  ('image', 'https://images.pexels.com/photos/37065020/pexels-photo-37065020.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Sebaran masakan tradisional di meja kayu', 1),
+  ('image', 'https://images.pexels.com/photos/38734532/pexels-photo-38734532.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Pengunjung menikmati hidangan di resto', 2),
+  ('image', 'https://images.pexels.com/photos/12676939/pexels-photo-12676939.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Sajian dalam mangkuk daun pisang', 3),
+  ('image', 'https://images.pexels.com/photos/37066472/pexels-photo-37066472.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Nasi Padang di atas daun pisang', 4),
+  ('image', 'https://images.pexels.com/photos/36425664/pexels-photo-36425664.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Keluarga menikmati makan bersama', 5),
+  ('image', 'https://images.pexels.com/photos/40418724/pexels-photo-40418724.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Nasi campur dengan es teh', 6),
+  ('image', 'https://images.pexels.com/photos/37179935/pexels-photo-37179935.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Sajian masakan Indonesia di meja kayu', 7),
+  ('image', 'https://images.pexels.com/photos/36363436/pexels-photo-36363436.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Ayah dan anak berbagi makanan tradisional', 8),
+  ('image', 'https://images.pexels.com/photos/37081088/pexels-photo-37081088.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Sepiring makan dengan es teh segar', 9),
+  ('image', 'https://images.pexels.com/photos/8507683/pexels-photo-8507683.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Keluarga makan bersama dengan gembira', 10),
+  ('image', 'https://images.pexels.com/photos/37081070/pexels-photo-37081070.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 'Daging gepuk goreng renyah', 11)
+ON CONFLICT DO NOTHING;
+
+-- Bagian 3: Tabel, keyword moderasi, dan waktu update ulasan
+-- Alas Daun - Neon schema for customer testimonials and moderation keywords.
+
+CREATE TABLE IF NOT EXISTS testimonial_blocked_keywords (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  keyword text NOT NULL CHECK (char_length(btrim(keyword)) BETWEEN 2 AND 80),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS testimonial_blocked_keywords_lower_idx
+  ON testimonial_blocked_keywords (lower(keyword));
+
+CREATE TABLE IF NOT EXISTS testimonials (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL CHECK (char_length(btrim(name)) BETWEEN 2 AND 80),
+  rating integer NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  review_text text NOT NULL CHECK (char_length(btrim(review_text)) BETWEEN 10 AND 1000),
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS testimonials_public_idx
+  ON testimonials (status, created_at DESC);
+
+CREATE OR REPLACE FUNCTION set_testimonials_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS testimonials_set_updated_at ON testimonials;
+
+CREATE TRIGGER testimonials_set_updated_at
+BEFORE UPDATE ON testimonials
+FOR EACH ROW
+EXECUTE FUNCTION set_testimonials_updated_at();
+
+INSERT INTO testimonial_blocked_keywords (keyword)
+VALUES
+  ('anjing'), ('bangsat'), ('babi'), ('tolol'), ('goblok'),
+  ('jancuk'), ('kontol'), ('memek'), ('fuck'), ('shit')
+ON CONFLICT DO NOTHING;
+
+
+-- Bagian 4: Akun admin awal
+-- Password tidak disimpan dalam teks biasa. Setelah DATABASE_URL disetel di backend/.env,
+-- jalankan: cd backend && npm run admin:create
+-- Kredensial akun admin diambil dari ADMIN_EMAIL dan ADMIN_PASSWORD pada backend/.env.
+
+-- Validasi database
+SELECT current_database() AS database, now() AS server_time;
+SELECT count(*) AS menu_count FROM public.menu_items;
+SELECT count(*) AS gallery_count FROM public.gallery_items;
+SELECT count(*) AS blocked_keyword_count FROM public.testimonial_blocked_keywords;

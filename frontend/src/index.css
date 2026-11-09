@@ -40,7 +40,6 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     scrollbar-color: #86A760 #FDF8EC;
     scrollbar-width: thin;
   }
@@ -72,14 +71,11 @@
 
 .animated-section {
   opacity: 0;
-  transform: translateY(24px);
-  transition:
-    opacity 0.65s ease-out var(--reveal-delay, 0s),
-    transform 0.65s ease-out var(--reveal-delay, 0s);
+  transform: translateZ(0);
+  transition: opacity 0.65s ease-out var(--reveal-delay, 0s);
 }
 .animated-section.is-visible {
   opacity: 1;
-  transform: translateY(0);
 }
 @media (prefers-reduced-motion: reduce) {
   .animated-section,
@@ -207,9 +203,43 @@ n8n-chat:hover {
   overflow: hidden;
 }
 .gallery-photo-slide {
-  width: fit-content;
-  max-width: 88%;
+  width: 514px;
+  max-width: calc(100vw - 120px);
   margin-inline: auto;
+  touch-action: pan-y;
+  user-select: none;
+}
+@media (max-width: 767px) {
+  .gallery-showcase-stage {
+    overflow-x: hidden;
+  }
+  .gallery-photo-slide {
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+  }
+  .gallery-polaroid-frame {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    border-radius: .55rem .55rem 1rem 1rem;
+  }
+  .gallery-polaroid-photo {
+    width: 100%;
+    height: min(52dvh, 420px);
+    max-width: 100%;
+    max-height: 52dvh;
+    border-radius: .55rem .55rem 1rem 1rem;
+  }
+  .gallery-photo-caption {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 12px 8px 8px;
+    box-sizing: border-box;
+    margin-inline: 0;
+  }
 }
 .gallery-photo-slide-next { animation: gallery-slide-next 600ms cubic-bezier(.2,.75,.25,1) both; }
 .gallery-photo-slide-previous { animation: gallery-slide-previous 600ms cubic-bezier(.2,.75,.25,1) both; }
@@ -229,26 +259,28 @@ n8n-chat:hover {
   height: 520px;
   max-width: calc(100vw - 120px);
   max-height: calc(100dvh - 240px);
-  border-radius: .7rem;
+  border-radius: .7rem .7rem 1rem 1rem;
   object-fit: cover;
 }
 .gallery-polaroid-frame {
   width: fit-content;
   padding: 12px;
   background: white;
-  border-radius: .55rem .55rem 0 0;
+  border-radius: .55rem .55rem 1rem 1rem;
 }
 .gallery-photo-caption {
-  width: 514px;
-  max-width: calc(100vw - 120px);
-  height: 116px;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
   box-sizing: border-box;
-  padding: 16px 18px 18px;
-  border-radius: 0 0 1rem 1rem;
-  background: white;
+  padding: 12px 8px 8px;
+  border-radius: 0;
+  background: transparent;
   overflow-wrap: anywhere;
   word-break: break-word;
-  overflow-y: auto;
+  overflow-y: visible;
+  margin-inline: 0;
 }
 .gallery-polaroid-caption {
   border-radius: 0 0 1.35rem 1.35rem;
