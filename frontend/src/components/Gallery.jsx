@@ -28,6 +28,7 @@ export function Gallery() {
     const [captionExpanded, setCaptionExpanded] = useState(false);
     const [needsCaptionExpansion, setNeedsCaptionExpansion] = useState(false);
     const captionRef = useRef(null);
+    const swipeStartRef = useRef(null);
     const categories = [
         {
             id: 'momen_di_alas_daun',
@@ -81,6 +82,24 @@ export function Gallery() {
             ? (albumIndex + 1) % modalItems.length
             : (albumIndex - 1 + modalItems.length) % modalItems.length;
         setAlbumIndex(nextIndex);
+    };
+    const startSwipe = (event) => {
+        event.currentTarget.setPointerCapture?.(event.pointerId);
+        swipeStartRef.current = {
+            x: event.clientX,
+            y: event.clientY,
+        };
+    };
+    const endSwipe = (event) => {
+        const start = swipeStartRef.current;
+        swipeStartRef.current = null;
+        if (!start)
+            return;
+        const offsetX = event.clientX - start.x;
+        const offsetY = event.clientY - start.y;
+        if (Math.abs(offsetX) < 40 || Math.abs(offsetX) <= Math.abs(offsetY))
+            return;
+        moveAlbum(offsetX < 0 ? 'next' : 'previous');
     };
     useEffect(() => {
         apiRequest('/api/gallery')
@@ -158,24 +177,30 @@ export function Gallery() {
       </div>
 
       {/* Gallery modal */}
-      {galleryModal && createPortal(<div className="fixed inset-0 z-[90] flex items-center justify-center bg-daun-900/80 p-3 backdrop-blur-sm animate-fade-in sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) setGalleryModal(null); }}>
-          <button type="button" onClick={() => setGalleryModal(null)} className="absolute right-5 top-5 z-30 rounded-full border border-white/20 bg-daun-900/70 p-2.5 text-white transition hover:bg-oranye-500" aria-label="Tutup galeri"><X size={22}/></button>
-          <div className="gallery-showcase-stage relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-4 sm:p-8">
+      {galleryModal && createPortal(<div className="fixed inset-0 z-[90] flex h-[100dvh] items-center justify-center overflow-hidden bg-daun-900/80 p-2 backdrop-blur-sm animate-fade-in sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) setGalleryModal(null); }}>
+          <button type="button" onClick={() => setGalleryModal(null)} className="absolute right-3 top-3 z-30 rounded-full border border-white/20 bg-daun-900/70 p-2 text-white transition hover:bg-oranye-500 sm:right-5 sm:top-5 sm:p-2.5" aria-label="Tutup galeri"><X size={22}/></button>
+          <div className="gallery-showcase-stage relative flex h-full w-full min-h-0 items-center justify-center overflow-y-auto overscroll-contain px-2 pb-5 pt-16 sm:px-16 sm:pb-8 sm:pt-8">
             {activeAlbumItem ? <>
-              <button type="button" onClick={() => moveAlbum('previous')} className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-daun-900/75 p-3 text-white shadow-lg transition hover:bg-oranye-500 sm:left-6" aria-label="Foto sebelumnya"><ChevronLeft size={26}/></button>
-              <div key={`${activeAlbumItem.id}-${albumIndex}`} className={`gallery-photo-slide gallery-photo-slide-${albumDirection}`}>
+              <button type="button" onClick={() => moveAlbum('previous')} className="absolute left-2 top-[42%] z-20 -translate-y-1/2 rounded-full bg-daun-900/75 p-2 text-white shadow-lg transition hover:bg-oranye-500 sm:left-4 sm:p-3 lg:left-6" aria-label="Foto sebelumnya"><ChevronLeft size={22}/><span className="sr-only">Foto sebelumnya</span></button>
+              <div
+                key={`${activeAlbumItem.id}-${albumIndex}`}
+                className={`gallery-photo-slide gallery-photo-slide-${albumDirection}`}
+                onPointerDown={startSwipe}
+                onPointerUp={endSwipe}
+                onPointerCancel={() => { swipeStartRef.current = null; }}
+              >
                 <div className="gallery-polaroid-frame mx-auto">
                   <img className="gallery-polaroid-photo" src={activeAlbumItem.src} alt={activeAlbumItem.alt}/>
                 </div>
-                <div className="gallery-photo-caption mt-0 mx-auto">
+                <div className="gallery-photo-caption mt-4 mx-auto text-center text-white">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-oranye-500">{String(albumIndex + 1).padStart(2, '0')} / {String(modalItems.length).padStart(2, '0')}</span>
-                  <p className="mt-1 font-body text-sm text-daun-700 sm:text-base">{activeAlbumItem.alt}</p>
+                  <p className="mt-1 font-body text-sm text-white sm:text-base">{activeAlbumItem.alt}</p>
                 </div>
                 <div className="mt-4 flex justify-center gap-1.5" aria-label="Posisi foto">
                   {modalItems.map((item, index) => <button key={item.id} type="button" onClick={() => { setAlbumDirection(index >= albumIndex ? 'next' : 'previous'); setAlbumIndex(index); }} aria-label={`Buka foto ${index + 1}`} className={`h-1.5 rounded-full transition-all ${index === albumIndex ? 'w-8 bg-oranye-500' : 'w-2 bg-daun-200 hover:bg-daun-400'}`} />)}
                 </div>
               </div>
-              <button type="button" onClick={() => moveAlbum('next')} className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-daun-900/75 p-3 text-white shadow-lg transition hover:bg-oranye-500 sm:right-6" aria-label="Foto berikutnya"><ChevronRight size={26}/></button>
+              <button type="button" onClick={() => moveAlbum('next')} className="absolute right-2 top-[42%] z-20 -translate-y-1/2 rounded-full bg-daun-900/75 p-2 text-white shadow-lg transition hover:bg-oranye-500 sm:right-4 sm:p-3 lg:right-6" aria-label="Foto berikutnya"><ChevronRight size={22}/><span className="sr-only">Foto berikutnya</span></button>
             </> : <p className="py-16 text-center text-daun-600">Belum ada foto pada kategori ini.</p>}
           </div>
       </div>, document.body)}
