@@ -3,6 +3,13 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getPool } from '../database.js';
+import {
+  findMenuTable,
+  getMenuTable,
+  getMenuUnionQuery,
+  MENU_CATEGORIES,
+  MENU_FIELDS,
+} from '../menu-repository.js';
 import { isAdminRequest } from './auth-controller.js';
 
 const MAX_MENU_IMAGE_BYTES = 3 * 1024 * 1024;
@@ -29,6 +36,7 @@ function normalizeMenuItem(row) {
     descriptionId: row.descriptionId,
     descriptionEn: row.descriptionEn,
     image: row.image,
+    subcategory: row.subcategory,
     isRecommended: row.isRecommended,
     isNew: row.isNew,
     promo: row.promo,
@@ -36,17 +44,15 @@ function normalizeMenuItem(row) {
   };
 }
 
-const menuFields = `id, name, category, price, description_id AS "descriptionId",
-  description_en AS "descriptionEn", image_url AS image,
-  is_recommended AS "isRecommended", is_new AS "isNew", promo,
-  sort_order AS "sortOrder"`;
-
 function validateMenuItem(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return 'Data menu tidak valid.';
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const category = typeof body.category === 'string' ? body.category.trim().toLowerCase() : '';
   const descriptionId = typeof body.descriptionId === 'string' ? body.descriptionId.trim() : '';
   const descriptionEn = typeof body.descriptionEn === 'string' ? body.descriptionEn.trim() : '';
+  const subcategory = typeof body.subcategory === 'string'
+    ? body.subcategory.trim().toLowerCase()
+    : '';
   const image = typeof body.image === 'string' ? body.image.trim() : '';
   const price = Number(body.price);
   const promo = body.promo === '' || body.promo === null || body.promo === undefined
@@ -54,8 +60,11 @@ function validateMenuItem(body) {
     : Number(body.promo);
 
   if (!name || name.length > 120) return 'Nama menu wajib diisi (maksimal 120 karakter).';
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(category) || category.length > 60) {
-    return 'Kategori harus berupa slug, misalnya paket-makanan.';
+  if (!MENU_CATEGORIES.includes(category)) {
+    return 'Kategori harus berupa ala-carte, paketan, minuman, atau hidangan-penutup.';
+  }
+  if (!subcategory || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(subcategory) || subcategory.length > 60) {
+    return 'Subkategori harus berupa slug, misalnya ayam-bebek atau minuman-dingin.';
   }
   if (!Number.isSafeInteger(price) || price < 1) return 'Harga harus berupa bilangan bulat lebih dari 0.';
   if (!descriptionId || descriptionId.length > 1000) return 'Deskripsi Bahasa Indonesia wajib diisi (maksimal 1000 karakter).';
@@ -87,6 +96,7 @@ function validateMenuItem(body) {
   return {
     name,
     category,
+    subcategory,
     price,
     descriptionId,
     descriptionEn,
@@ -100,8 +110,8 @@ function validateMenuItem(body) {
 
 export async function listMenu() {
   const result = await getPool().query(
-    `SELECT ${menuFields} FROM public.menu_items
-     WHERE is_active = TRUE ORDER BY sort_order, name`,
+    `SELECT * FROM (${getMenuUnionQuery()}) AS menu_items
+     WHERE "isActive" = TRUE ORDER BY "sortOrder", name`,
   );
   return response(200, { data: result.rows.map(normalizeMenuItem) });
 }
@@ -139,8 +149,8 @@ export async function uploadMenuImage(request, body) {
 export async function listAdminMenu(request) {
   if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
   const result = await getPool().query(
-    `SELECT ${menuFields}, is_active AS "isActive" FROM public.menu_items
-     ORDER BY sort_order, name`,
+    `SELECT * FROM (${getMenuUnionQuery()}) AS menu_items
+     ORDER BY "sortOrder", name`,
   );
   return response(200, { data: result.rows.map((row) => ({
     ...normalizeMenuItem(row),
@@ -152,14 +162,15 @@ export async function createMenu(request, body) {
   if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
   const item = validateMenuItem(body);
   if (typeof item === 'string') return response(400, { error: item });
+  const table = getMenuTable(item.category);
   const result = await getPool().query(
-    `INSERT INTO public.menu_items
+    `INSERT INTO public.${table}
       (name, category, price, description_id, description_en, image_url,
-       is_recommended, is_new, promo, sort_order)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-     RETURNING ${menuFields}`,
+       subcategory, is_recommended, is_new, promo, sort_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+     RETURNING ${MENU_FIELDS}`,
     [item.name, item.category, item.price, item.descriptionId, item.descriptionEn,
-      item.image, item.isRecommended, item.isNew, item.promo, item.sortOrder],
+      item.image, item.subcategory, item.isRecommended, item.isNew, item.promo, item.sortOrder],
   );
   return response(201, { data: normalizeMenuItem(result.rows[0]) });
 }
@@ -171,19 +182,57 @@ export async function updateMenu(request, body, id) {
   }
   const item = validateMenuItem(body);
   if (typeof item === 'string') return response(400, { error: item });
-  const result = await getPool().query(
-    `UPDATE public.menu_items SET
-       name = $2, category = $3, price = $4, description_id = $5,
-       description_en = $6, image_url = $7, is_recommended = $8,
-       is_new = $9, promo = $10, sort_order = $11, is_active = $12
-     WHERE id = $1
-     RETURNING ${menuFields}, is_active AS "isActive"`,
-    [id, item.name, item.category, item.price, item.descriptionId,
-      item.descriptionEn, item.image, item.isRecommended, item.isNew,
-      item.promo, item.sortOrder, body.isActive !== false],
-  );
-  if (!result.rows[0]) return response(404, { error: 'Menu tidak ditemukan.' });
-  return response(200, { data: { ...normalizeMenuItem(result.rows[0]), isActive: result.rows[0].isActive } });
+  const client = await getPool().connect();
+  let inTransaction = false;
+  try {
+    const currentTable = await findMenuTable(client, id);
+    if (!currentTable) return response(404, { error: 'Menu tidak ditemukan.' });
+    const targetTable = getMenuTable(item.category);
+    const values = [id, item.name, item.category, item.price, item.descriptionId,
+      item.descriptionEn, item.image, item.subcategory, item.isRecommended, item.isNew,
+      item.promo, item.sortOrder, body.isActive !== false];
+    let result;
+    if (currentTable === targetTable) {
+      result = await client.query(
+        `UPDATE public.${currentTable} SET
+           name = $2, category = $3, price = $4, description_id = $5,
+           description_en = $6, image_url = $7, subcategory = $8,
+           is_recommended = $9, is_new = $10, promo = $11,
+           sort_order = $12, is_active = $13
+         WHERE id = $1
+         RETURNING ${MENU_FIELDS}`,
+        values,
+      );
+    } else {
+      await client.query('BEGIN');
+      inTransaction = true;
+      const current = await client.query(
+        `SELECT created_at FROM public.${currentTable} WHERE id = $1`,
+        [id],
+      );
+      if (!current.rows[0]) {
+        await client.query('ROLLBACK');
+        return response(404, { error: 'Menu tidak ditemukan.' });
+      }
+      await client.query(`DELETE FROM public.${currentTable} WHERE id = $1`, [id]);
+      result = await client.query(
+        `INSERT INTO public.${targetTable}
+          (id, name, category, price, description_id, description_en, image_url,
+           subcategory, is_recommended, is_new, promo, sort_order, is_active, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+         RETURNING ${MENU_FIELDS}`,
+        [...values, current.rows[0].created_at],
+      );
+      await client.query('COMMIT');
+      inTransaction = false;
+    }
+    return response(200, { data: normalizeMenuItem(result.rows[0]) });
+  } catch (error) {
+    if (inTransaction) await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 export async function deleteMenu(request, id) {
@@ -191,10 +240,17 @@ export async function deleteMenu(request, id) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
     return response(400, { error: 'ID menu tidak valid.' });
   }
-  const result = await getPool().query(
-    'DELETE FROM public.menu_items WHERE id = $1 RETURNING id',
-    [id],
-  );
-  if (!result.rows[0]) return response(404, { error: 'Menu tidak ditemukan.' });
+  const client = await getPool().connect();
+  try {
+    const table = await findMenuTable(client, id);
+    if (!table) return response(404, { error: 'Menu tidak ditemukan.' });
+    const result = await client.query(
+      `DELETE FROM public.${table} WHERE id = $1 RETURNING id`,
+      [id],
+    );
+    if (!result.rows[0]) return response(404, { error: 'Menu tidak ditemukan.' });
+  } finally {
+    client.release();
+  }
   return response(200, { deleted: true });
 }

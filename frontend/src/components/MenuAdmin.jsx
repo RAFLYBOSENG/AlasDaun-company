@@ -5,6 +5,7 @@ import { apiRequest } from '../lib/api';
 const emptyMenu = {
   name: '',
   category: '',
+  subcategory: '',
   price: '',
   descriptionId: '',
   descriptionEn: '',
@@ -15,6 +16,13 @@ const emptyMenu = {
   sortOrder: 0,
   isActive: true,
 };
+
+const menuCategories = [
+  ['ala-carte', 'Menu Ala Carte'],
+  ['paketan', 'Menu Paketan'],
+  ['minuman', 'Menu Minuman'],
+  ['hidangan-penutup', 'Hidangan Penutup'],
+];
 
 function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
@@ -76,6 +84,7 @@ export function MenuAdmin() {
       const matchesSearch = !query || [
         item.name,
         item.category,
+        item.subcategory,
         String(item.price),
         priceLabel(item.price),
       ].some((value) => String(value).toLowerCase().includes(query));
@@ -418,10 +427,9 @@ export function MenuAdmin() {
                 className={inputClass}
               >
                 <option value="" disabled>Pilih kategori</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>{category}</option>
+                {menuCategories.map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
                 ))}
-                <option value="__new_category__">+ Tambah kategori</option>
               </select>
               {addingCategory && (
                 <div className="mt-2">
@@ -449,6 +457,24 @@ export function MenuAdmin() {
                 </div>
               )}
             </div>
+            <label className="text-sm font-medium text-daun-700">
+              Subkategori / filter
+              <input
+                name="subcategory"
+                value={form.subcategory}
+                onChange={(event) => setForm((current) => ({
+                  ...current,
+                  subcategory: categorySlug(event.target.value),
+                }))}
+                required
+                maxLength={60}
+                placeholder="Contoh: ayam-bebek"
+                className={inputClass}
+              />
+              <span className="mt-1 block text-xs font-normal text-daun-500">
+                Bisa membuat filter baru, gunakan huruf kecil dan tanda hubung.
+              </span>
+            </label>
             <label className="text-sm font-medium text-daun-700">
               Harga (Rp)
               <input name="price" type="number" min="1" step="1" value={form.price} onChange={updateField} required className={inputClass} />

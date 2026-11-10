@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, BadgePercent, Sparkles, Star, X } from 'lucide-react';
 import { useLang } from '../lib/language-context';
-import { categoryLabels } from '../data/menu';
+import { categoryLabels, subcategoryLabels } from '../data/menu';
 import { apiRequest } from '../lib/api';
 
 function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay = 0, badges = [] }) {
@@ -101,11 +101,12 @@ function MenuCategoryCard({ title, items, onClick, accent = false, staggerDelay 
 
 export function MenuSection() {
     const { lang, dict } = useLang();
-    const [active, setActive] = useState('all');
     const [menuItems, setMenuItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showAll, setShowAll] = useState(false);
+    const [allCategory, setAllCategory] = useState('ala-carte');
+    const [allSubcategory, setAllSubcategory] = useState('all');
     const [showFeatured, setShowFeatured] = useState(false);
     const [showPackages, setShowPackages] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState(null);
@@ -129,17 +130,28 @@ export function MenuSection() {
         const label = categoryLabels[category];
         return label ? (lang === 'id' ? label.id : label.en) : category.replaceAll('-', ' ');
     };
-    const categories = [...new Set(menuItems.map((item) => item.category))].filter((category) => category !== 'paket-makanan');
+    const subcategoryName = (subcategory) => {
+        const label = subcategoryLabels[subcategory];
+        return label ? (lang === 'id' ? label.id : label.en) : subcategory.replaceAll('-', ' ');
+    };
     const featuredItems = menuItems.filter((item) => item.isRecommended || item.promo);
-    const packageItems = menuItems.filter((item) => item.category === 'paket-makanan');
-    const regularItems = menuItems.filter((item) => item.category !== 'paket-makanan' && !item.isRecommended && !item.promo);
-    const otherItems = menuItems.filter((item) => item.category !== 'paket-makanan');
+    const packageItems = menuItems.filter((item) => item.category === 'paketan');
+    const alaCarteItems = menuItems.filter((item) => item.category === 'ala-carte');
+    const drinkItems = menuItems.filter((item) => item.category === 'minuman');
+    const dessertItems = menuItems.filter((item) => item.category === 'hidangan-penutup');
     const filteredAll = useMemo(() => (
         menuItems.filter((item) => {
-            if (item.category === 'paket-makanan') return false;
-            return active === 'all' || item.category === active;
+            if (item.category === 'paketan') return false;
+            return item.category === allCategory
+                && (allSubcategory === 'all' || item.subcategory === allSubcategory);
         })
-    ), [active, menuItems]);
+    ), [allCategory, allSubcategory, menuItems]);
+    const availableSubcategories = [...new Set(
+        menuItems
+            .filter((item) => item.category === allCategory)
+            .map((item) => item.subcategory)
+            .filter(Boolean),
+    )];
     useEffect(() => {
         if (!selectedMenu && !showAll && !showFeatured && !showPackages) return undefined;
         const previousOverflow = document.body.style.overflow;
@@ -252,10 +264,16 @@ export function MenuSection() {
               />
             )}
             {packageItems.length > 0 && (
-              <MenuCategoryCard title={lang === 'id' ? 'Paket Makanan' : 'Meal Packages'} items={packageItems} onClick={() => setShowPackages(true)} staggerDelay={1300} />
+              <MenuCategoryCard title={lang === 'id' ? 'Menu Paketan' : 'Meal Packages'} items={packageItems} onClick={() => setShowPackages(true)} staggerDelay={1300} />
             )}
-            {otherItems.length > 0 && (
-              <MenuCategoryCard title="Menu Ala Carte" items={otherItems} onClick={() => setShowAll(true)} staggerDelay={2600} />
+            {alaCarteItems.length > 0 && (
+              <MenuCategoryCard title={lang === 'id' ? 'Menu Ala Carte' : 'A La Carte'} items={alaCarteItems} onClick={() => { setAllCategory('ala-carte'); setAllSubcategory('all'); setShowAll(true); }} staggerDelay={2600} />
+            )}
+            {drinkItems.length > 0 && (
+              <MenuCategoryCard title={lang === 'id' ? 'Menu Minuman' : 'Beverages'} items={drinkItems} onClick={() => { setAllCategory('minuman'); setAllSubcategory('all'); setShowAll(true); }} staggerDelay={3900} />
+            )}
+            {dessertItems.length > 0 && (
+              <MenuCategoryCard title={lang === 'id' ? 'Hidangan Penutup' : 'Desserts'} items={dessertItems} onClick={() => { setAllCategory('hidangan-penutup'); setAllSubcategory('all'); setShowAll(true); }} staggerDelay={5200} />
             )}
           </div>
         )}
@@ -275,7 +293,7 @@ export function MenuSection() {
           >
             <div className="flex items-center justify-between border-b border-daun-100 px-5 py-4 sm:px-7">
               <h3 id="package-menu-title" className="font-heading text-xl font-bold text-daun-700 sm:text-2xl">
-                {lang === 'id' ? 'Paket Makanan' : 'Meal Packages'}
+                {lang === 'id' ? 'Menu Paketan' : 'Meal Packages'}
               </h3>
               <button
                 type="button"
@@ -343,7 +361,7 @@ export function MenuSection() {
           >
             <div className="flex items-center justify-between border-b border-daun-100 px-5 py-4 sm:px-7">
               <h3 id="all-menu-title" className="font-heading text-xl font-bold text-daun-700 sm:text-2xl">
-                Menu Ala Carte
+                {categoryName(allCategory)}
               </h3>
               <button
                 type="button"
@@ -358,21 +376,21 @@ export function MenuSection() {
               <div className="no-scrollbar mb-5 flex gap-2 overflow-x-auto pb-2">
                 <button
                   type="button"
-                  onClick={() => setActive('all')}
-                  aria-pressed={active === 'all'}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${active === 'all' ? 'bg-daun-500 text-krem-100 shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
+                  onClick={() => setAllSubcategory('all')}
+                  aria-pressed={allSubcategory === 'all'}
+                  className={`whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${allSubcategory === 'all' ? 'bg-daun-500 text-krem-100 shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
                 >
                   {dict.menu.all}
                 </button>
-                {categories.map((category) => (
+                {availableSubcategories.map((subcategory) => (
                   <button
                     type="button"
-                    key={category}
-                    onClick={() => setActive(category)}
-                    aria-pressed={active === category}
-                    className={`whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${active === category ? 'bg-daun-500 text-krem-100 shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
+                    key={subcategory}
+                    onClick={() => setAllSubcategory(subcategory)}
+                    aria-pressed={allSubcategory === subcategory}
+                    className={`whitespace-nowrap rounded-full px-4 py-2 font-body text-sm font-medium transition ${allSubcategory === subcategory ? 'bg-daun-500 text-krem-100 shadow-soft' : 'bg-daun-50 text-daun-600 hover:bg-daun-100'}`}
                   >
-                    {categoryName(category)}
+                    {subcategoryName(subcategory)}
                   </button>
                 ))}
               </div>

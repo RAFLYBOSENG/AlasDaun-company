@@ -1,17 +1,27 @@
 export const categoryLabels = {
-    'paket-makanan': { id: 'Paket Makanan', en: 'Meal Packages' },
-    'lauk-ikan': { id: 'Lauk Ikan', en: 'Fish Dishes' },
-    'lauk-ayam-bebek': { id: 'Lauk Ayam & Bebek', en: 'Chicken & Duck' },
-    'jeroan': { id: 'Jeroan', en: 'Offal' },
+    'ala-carte': { id: 'Menu Ala Carte', en: 'A La Carte' },
+    paketan: { id: 'Menu Paketan', en: 'Meal Packages' },
     'minuman': { id: 'Minuman', en: 'Beverages' },
-    'oleh-oleh': { id: 'Oleh-oleh', en: 'Souvenirs' },
+    'hidangan-penutup': { id: 'Hidangan Penutup', en: 'Desserts' },
+};
+export const subcategoryLabels = {
+    'ayam-bebek': { id: 'Ayam & Bebek', en: 'Chicken & Duck' },
+    ikan: { id: 'Ikan', en: 'Fish' },
+    jeroan: { id: 'Jeroan', en: 'Offal' },
+    'minuman-dingin': { id: 'Minuman Dingin', en: 'Cold Drinks' },
+    'minuman-panas': { id: 'Minuman Panas', en: 'Hot Drinks' },
+    teh: { id: 'Teh', en: 'Tea' },
+    jus: { id: 'Jus', en: 'Juices' },
+    'minuman-signature': { id: 'Minuman Signature', en: 'Signature Drinks' },
+    lainnya: { id: 'Lainnya', en: 'Other' },
 };
 export const menuItems = [
     // Paket Makanan — Ayam
     {
         id: 'ayam-goreng-santan',
         name: 'Paket Ayam Goreng Santan',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'ayam-bebek',
         price: 72000,
         descriptionId: 'Ayam goreng berkuah santan kental, disajikan di atas daun pisang dengan nasi hangat dan sambal dadak.',
         descriptionEn: 'Fried chicken in rich coconut gravy, served on banana leaf with warm rice and fresh chili paste.',
@@ -21,7 +31,8 @@ export const menuItems = [
     {
         id: 'ayam-kecap',
         name: 'Paket Ayam Kecap',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'ayam-bebek',
         price: 72000,
         descriptionId: 'Ayam kampung empuk dimasak kecap manis dengan bumbu rempah khas Sunda, manis gurih berpadat rasa.',
         descriptionEn: 'Tender village chicken slow-cooked in sweet soy sauce with traditional Sundanese spices.',
@@ -30,7 +41,8 @@ export const menuItems = [
     {
         id: 'ayam-kampung',
         name: 'Paket Ayam Kampung',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'ayam-bebek',
         price: 98000,
         descriptionId: 'Ayam kampung asli dengan tekstur padat dan rasa gurih, digoreng kering dan disajikan bersama lalapan.',
         descriptionEn: 'Authentic free-range chicken with firm texture and savory taste, fried and served with fresh greens.',
@@ -40,7 +52,8 @@ export const menuItems = [
     {
         id: 'bebek',
         name: 'Paket Bebek',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'ayam-bebek',
         price: 124000,
         descriptionId: 'Bebek empuk berbumbu rempah pilihan, digoreng hingga kulitnya garing, dagingnya tetap lembut di mulut.',
         descriptionEn: 'Tender duck marinated in select spices, fried until skin crisps while meat stays melt-in-mouth soft.',
@@ -50,7 +63,8 @@ export const menuItems = [
     {
         id: 'gepuk',
         name: 'Paket Gepuk',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'ayam-bebek',
         price: 76000,
         descriptionId: 'Daging sapi gepuk yang digepung tipis, goreng renyah di luar namun tetap juicy, bumbu meresap hingga ke dalam.',
         descriptionEn: 'Thinly pounded beef, crisp outside yet juicy inside, spices soaked through every fiber.',
@@ -60,7 +74,8 @@ export const menuItems = [
     {
         id: 'usus-sapi',
         name: 'Paket Usus Sapi',
-        category: 'jeroan',
+        category: 'ala-carte',
+        subcategory: 'jeroan',
         price: 66000,
         descriptionId: 'Usus sapi dimasak dengan bumbu rempah kental, tekstur kenyal khas dengan rasa yang dalam.',
         descriptionEn: 'Beef intestine cooked in thick spiced gravy, signature chewy texture with deep flavor.',
@@ -70,7 +85,8 @@ export const menuItems = [
     {
         id: 'bandeng',
         name: 'Paket Bandeng',
-        category: 'lauk-ikan',
+        category: 'ala-carte',
+        subcategory: 'ikan',
         price: 55000,
         descriptionId: 'Bandeng goreng kering dengan duri yang sudah lunak, gurih dan renyah, cocok dimakan bersama nasi panas.',
         descriptionEn: 'Crispy fried milkfish with softened bones, savory and crunchy, perfect with hot rice.',
@@ -79,7 +95,8 @@ export const menuItems = [
     {
         id: 'barakuda',
         name: 'Paket Barakuda',
-        category: 'lauk-ikan',
+        category: 'ala-carte',
+        subcategory: 'ikan',
         price: 70000,
         descriptionId: 'Ikan barakuda dibakar dengan bumbu kuning, dagingnya tebal dan padat, disajikan dengan sambal dabu-dabu.',
         descriptionEn: 'Grilled barracuda with yellow spice, thick firm meat served with dabu-dabu chili.',
@@ -88,7 +105,8 @@ export const menuItems = [
     {
         id: 'gurame',
         name: 'Paket Gurame',
-        category: 'lauk-ikan',
+        category: 'ala-carte',
+        subcategory: 'ikan',
         price: 50000,
         descriptionId: 'Gurame goreng kering, kulit renyah dan daging tebal manis, favorit keluarga sejak dulu.',
         descriptionEn: 'Crispy fried gurame, crunchy skin and sweet thick meat, a long-time family favorite.',
@@ -98,7 +116,8 @@ export const menuItems = [
     {
         id: 'baronang',
         name: 'Paket Ikan Baronang',
-        category: 'lauk-ikan',
+        category: 'ala-carte',
+        subcategory: 'ikan',
         price: 80000,
         descriptionId: 'Ikan baronang dibakar sempurna, daging lembut dengan rasa manis alami laut, disajikan dengan sambal kecap.',
         descriptionEn: 'Perfectly grilled rabbitfish, soft meat with natural ocean sweetness, served with soy chili.',
@@ -107,7 +126,8 @@ export const menuItems = [
     {
         id: 'nila-merah',
         name: 'Paket Nila Merah',
-        category: 'lauk-ikan',
+        category: 'ala-carte',
+        subcategory: 'ikan',
         price: 70000,
         descriptionId: 'Nila merah digoreng dengan bumbu bawang putih, daging putih lembut, disajikan dengan lalapan segar.',
         descriptionEn: 'Red tilapia fried with garlic spice, tender white meat served with fresh greens.',
@@ -117,7 +137,8 @@ export const menuItems = [
     {
         id: 'ayam-bambu',
         name: 'Ayam Bambu',
-        category: 'lauk-ayam-bebek',
+        category: 'ala-carte',
+        subcategory: 'ayam-bebek',
         price: 88000,
         descriptionId: 'Ayam utuh dibakar dalam batang bambu, asap memberi aroma kayu khas, daging juicy dan haraf rempah.',
         descriptionEn: 'Whole chicken roasted inside bamboo, smoke lends a woody aroma, juicy meat fragrant with spice.',
@@ -127,7 +148,8 @@ export const menuItems = [
     {
         id: 'bebek-bambu',
         name: 'Bebek Bambu',
-        category: 'lauk-ayam-bebek',
+        category: 'ala-carte',
+        subcategory: 'ayam-bebek',
         price: 115000,
         descriptionId: 'Bebek dimarinasi bumbu pedas lalu dibakar dalam bambu, aroma dan keempukan dagingnya tidak biasa.',
         descriptionEn: 'Duck marinated in spicy paste then roasted in bamboo, remarkable aroma and tenderness.',
@@ -139,6 +161,7 @@ export const menuItems = [
         id: 'es-pandawa',
         name: 'Es Pandawa',
         category: 'minuman',
+        subcategory: 'minuman-signature',
         price: 25000,
         descriptionId: 'Minuman segar perpaduan kelapa muda, kolang-kiling, dan sirup pandan, manis sejuk menyegarkan.',
         descriptionEn: 'Refreshing blend of young coconut, kolang-kiling, and pandan syrup, sweet and cooling.',
@@ -149,6 +172,7 @@ export const menuItems = [
         id: 'es-teh',
         name: 'Es Teh Manis',
         category: 'minuman',
+        subcategory: 'teh',
         price: 10000,
         descriptionId: 'Teh manis dingin klasik, pelengkap sempurna untuk makan pedas beralas daun.',
         descriptionEn: 'Classic iced sweet tea, the perfect companion to a spicy banana-leaf meal.',
@@ -158,6 +182,7 @@ export const menuItems = [
         id: 'es-jeruk',
         name: 'Es Jeruk',
         category: 'minuman',
+        subcategory: 'jus',
         price: 12000,
         descriptionId: 'Jeruk peras segar dengan es batu, asam manis menyegarkan untuk menetralisir rasa pedas.',
         descriptionEn: 'Freshly squeezed orange with ice, sweet-tart refreshment to balance the heat.',
@@ -167,7 +192,8 @@ export const menuItems = [
     {
         id: 'kacang-roay',
         name: 'Kacang Roay',
-        category: 'oleh-oleh',
+        category: 'hidangan-penutup',
+        subcategory: 'lainnya',
         price: 35000,
         descriptionId: 'Kacang tanah sangrai dengan bumbu pedas manis, camilan klasik yang sukar ditolak.',
         descriptionEn: 'Roasted peanuts with sweet-spicy seasoning, an irresistible classic snack.',
@@ -176,7 +202,8 @@ export const menuItems = [
     {
         id: 'nasi-liwet',
         name: 'Paket Nasi Liwet',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'paketan',
         price: 68000,
         descriptionId: 'Nasi liwet gurih dengan ayam suwir, tahu, tempe, dan sambal, disajikan hangat di atas daun pisang.',
         descriptionEn: 'Savory rice served with shredded chicken, tofu, tempeh, and chili paste on a banana leaf.',
@@ -185,7 +212,8 @@ export const menuItems = [
     {
         id: 'ayam-bakar-madu',
         name: 'Paket Ayam Bakar Madu',
-        category: 'lauk-ayam-bebek',
+        category: 'ala-carte',
+        subcategory: 'ayam-bebek',
         price: 78000,
         descriptionId: 'Ayam bakar berbumbu rempah dengan olesan madu, disajikan bersama nasi, lalapan, dan sambal.',
         descriptionEn: 'Spiced grilled chicken glazed with honey, served with rice, fresh vegetables, and chili paste.',
@@ -195,7 +223,8 @@ export const menuItems = [
     {
         id: 'sayur-asem',
         name: 'Sayur Asem',
-        category: 'paket-makanan',
+        category: 'paketan',
+        subcategory: 'sayuran',
         price: 18000,
         descriptionId: 'Sayur asem segar dengan jagung, kacang panjang, dan labu, bercita rasa asam gurih khas rumahan.',
         descriptionEn: 'A refreshing tamarind vegetable soup with corn, long beans, and squash.',

@@ -157,7 +157,7 @@ export function Gallery() {
             const previewItems = items.filter((item) => item.category === category.id && item.type !== 'video');
             const previewItem = previewItems.length ? previewItems[(previewIndex + index) % previewItems.length] : null;
             return <button key={category.id} type="button" onClick={() => openGallery(category.id, (previewIndex + index) % Math.max(previewItems.length, 1))} aria-label={`Buka galeri ${category.label}`} className="gallery-category-card group relative min-h-48 overflow-hidden rounded-2xl border border-daun-100 bg-white/80 text-daun-700 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-daun-600 hover:bg-daun-600 hover:text-white hover:shadow-card">
-              <div className="relative h-32 overflow-hidden bg-daun-100">
+              <div className="gallery-category-preview relative overflow-hidden bg-daun-100">
                 {previewItem && <img key={`${category.id}-${previewItem.id}-${previewIndex}`} src={previewItem.src} alt="" className="gallery-card-preview h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" />}
                 <div className="absolute inset-0 bg-gradient-to-t from-daun-900/65 via-daun-900/10 to-transparent transition-colors duration-300 group-hover:from-daun-600/90"/>
                 <div className="absolute bottom-3 left-4 flex gap-1.5">

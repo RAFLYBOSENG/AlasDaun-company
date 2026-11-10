@@ -179,6 +179,9 @@ n8n-chat:hover {
 .gallery-mosaic-item img,
 .gallery-mosaic-item video { height: 100%; object-fit: cover; }
 .gallery-card-preview { animation: gallery-card-preview-in 700ms ease both; }
+.gallery-category-preview {
+  aspect-ratio: 16 / 9;
+}
 .gallery-modal-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -229,6 +232,7 @@ n8n-chat:hover {
     max-width: 100%;
     max-height: 52dvh;
     border-radius: .55rem .55rem 1rem 1rem;
+    object-fit: contain;
   }
   .gallery-photo-caption {
     width: 100%;
@@ -260,7 +264,9 @@ n8n-chat:hover {
   max-width: calc(100vw - 120px);
   max-height: calc(100dvh - 240px);
   border-radius: .7rem .7rem 1rem 1rem;
-  object-fit: cover;
+  background: #f3ead5;
+  object-fit: contain;
+  object-position: center;
 }
 .gallery-polaroid-frame {
   width: fit-content;
