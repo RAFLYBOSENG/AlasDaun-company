@@ -109,6 +109,15 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+.sensitive-keyword {
+  filter: blur(4px);
+  transition: filter 180ms ease;
+}
+.group:hover .sensitive-keyword,
+.group:focus-within .sensitive-keyword {
+  filter: blur(0);
+}
+
 /* Alas Daun theme for the n8n chat widget. */
 n8n-chat {
   --chat--color--primary: #2f5d3a;

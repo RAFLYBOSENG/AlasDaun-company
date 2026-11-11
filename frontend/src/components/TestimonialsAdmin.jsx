@@ -104,7 +104,10 @@ export function TestimonialsAdmin({ onError, onNotice }) {
           <button type="submit" className="btn-primary whitespace-nowrap">Tambah</button>
         </form>
         <div className="mt-4 flex flex-wrap gap-2">
-          {keywords.map((item) => <span key={item.id} className="inline-flex items-center gap-1 rounded-full bg-daun-50 px-3 py-1.5 text-sm text-daun-700">{item.keyword}<button onClick={() => removeKeyword(item)} aria-label={`Hapus keyword ${item.keyword}`}><X size={14} /></button></span>)}
+          {keywords.map((item) => <span key={item.id} className="group inline-flex items-center gap-1 rounded-full bg-daun-50 px-3 py-1.5 text-sm text-daun-700">
+            <span className="sensitive-keyword" title="Arahkan kursor untuk melihat keyword">{item.keyword}</span>
+            <button type="button" onClick={() => removeKeyword(item)} aria-label={`Hapus keyword ${item.keyword}`}><X size={14} /></button>
+          </span>)}
         </div>
       </div>
     </div>
