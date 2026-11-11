@@ -12,6 +12,19 @@ import { LocationMap } from './components/LocationMap';
 import { Footer } from './components/Footer';
 import { AnimatedSection } from './components/AnimatedSection';
 import { LinkInBio } from './components/LinkInBio';
+
+const DEFAULT_ADMIN_PATH = '/Admin-PAlasDaun';
+const configuredAdminPath = import.meta.env.VITE_ADMIN_PATH?.trim();
+const ADMIN_PATH = configuredAdminPath?.startsWith('/')
+    && !configuredAdminPath.includes('#')
+    && !configuredAdminPath.includes('?')
+    ? configuredAdminPath.replace(/\/+$/, '') || DEFAULT_ADMIN_PATH
+    : DEFAULT_ADMIN_PATH;
+
+function isAdminPath(pathname) {
+    return pathname === ADMIN_PATH || pathname === `${ADMIN_PATH}/`;
+}
+
 function MainSite() {
     return (<div className="min-w-0 overflow-x-hidden">
       <Navbar />
@@ -32,13 +45,11 @@ function App() {
         window.location.pathname === '/links'
         || /^#\/?links(?:$|\/)/.test(window.location.hash)
     ));
-    const [isAdmin, setIsAdmin] = useState(() => {
-        return window.location.pathname === '/admin' || /^#\/?admin(?:$|\/)/.test(window.location.hash);
-    });
+    const [isAdmin, setIsAdmin] = useState(() => isAdminPath(window.location.pathname));
 
     useEffect(() => {
         const updateRoute = () => {
-            setIsAdmin(window.location.pathname === '/admin' || /^#\/?admin(?:$|\/)/.test(window.location.hash));
+            setIsAdmin(isAdminPath(window.location.pathname));
             setIsLinkInBio(window.location.pathname === '/links' || /^#\/?links(?:$|\/)/.test(window.location.hash));
         };
         window.addEventListener('hashchange', updateRoute);

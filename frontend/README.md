@@ -24,7 +24,7 @@ npm run dev
 Sebelum menjalankan perintah tersebut, salin `backend/.env.example` ke
 `backend/.env`, isi `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_EMAIL`, dan
 `ADMIN_PASSWORD`, lalu jalankan schema Neon. Buka `/` untuk melihat menu dari
-database dan `/#/admin` untuk login serta mengelolanya. Panduan database lengkap tersedia di
+database dan `/admin-portal` untuk login serta mengelolanya. Panduan database lengkap tersedia di
 [`../backend/neon/README.md`](../backend/neon/README.md).
 
 ## Deploy ke Vercel
@@ -41,6 +41,8 @@ database dan `/#/admin` untuk login serta mengelolanya. Panduan database lengkap
    - `SESSION_SECRET` — secret acak minimal 32 karakter
    - `ADMIN_EMAIL` — email admin awal
    - `ADMIN_PASSWORD` — password admin awal minimal 12 karakter
+   - `VITE_ADMIN_PATH` — jalur privat halaman login admin, misalnya
+     `/pintu-admin-acak`; jika tidak diisi, gunakan `/admin-portal`
 
 4. Jalankan seluruh schema SQL di Neon sebelum membuka halaman admin. Setelah
    deployment pertama, buat akun admin dengan menjalankan provisioning dari
