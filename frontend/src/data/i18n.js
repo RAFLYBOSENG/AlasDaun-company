@@ -1,7 +1,7 @@
 export const t = {
     id: {
         nav: { home: 'Beranda', menu: 'Menu', about: 'Tentang', gallery: 'Galeri', location: 'Lokasi', contact: 'Kontak' },
-        hero: { greeting: 'Wilujeung Sumping di Alas Daun', sit: 'Mangga Linggih', subtitle: 'Sensasi Makan Tanpa Piring', viewMenu: 'Lihat Menu', open: 'Buka', closed: 'Tutup' },
+        hero: { greeting: 'Wilujeung Sumping di Alas Daun', sit: 'Mangga Linggih', subtitle: 'Sensasi Makan Tanpa Piring', viewMenu: 'Lihat Menu', open: 'Buka', closed: 'Tutup', hoursUnavailable: '09.00 - 22.00' },
         uniq: { title: 'Keunikan Alas Daun', subtitle: 'Bukan sekadar makan — ini adalah pengalaman.' },
         menu: { title: 'Menu Pilihan', subtitle: 'Setiap hidangan disajikan segar di atas daun pisang.', search: 'Cari menu...', all: 'Semua', price: 'Harga', recommended: 'Recommended', baru: 'Menu Baru', promo: 'Promo' },
         video: { title: 'Profil Alas Daun', subtitle: 'Saksikan suasana makan beralas daun.' },
@@ -14,7 +14,7 @@ export const t = {
     },
     en: {
         nav: { home: 'Home', menu: 'Menu', about: 'About', gallery: 'Gallery', location: 'Location', contact: 'Contact' },
-        hero: { greeting: 'Welcome to Alas Daun', sit: 'Please, Have a Seat', subtitle: 'The No-Plate Dining Sensation', viewMenu: 'View Menu', open: 'Open', closed: 'Closed' },
+        hero: { greeting: 'Welcome to Alas Daun', sit: 'Please, Have a Seat', subtitle: 'The No-Plate Dining Sensation', viewMenu: 'View Menu', open: 'Open', closed: 'Closed', hoursUnavailable: 'Opening hours unavailable' },
         uniq: { title: 'What Makes Us Unique', subtitle: 'Not just a meal — an experience.' },
         menu: { title: 'Featured Menu', subtitle: 'Every dish served fresh on banana leaves.', search: 'Search menu...', all: 'All', price: 'Price', recommended: 'Recommended', baru: 'New', promo: 'Promo' },
         video: { title: 'Alas Daun Profile', subtitle: 'Watch the banana-leaf dining experience.' },

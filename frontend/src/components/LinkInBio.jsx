@@ -1,27 +1,13 @@
 import {
-  Bike,
   Facebook,
   Globe2,
   Instagram,
-  MessageCircle,
   Search,
-  ShoppingBag,
   Youtube,
 } from 'lucide-react';
 import { restaurantInfo } from '../data/content';
 
 const websiteUrl = 'https://www.alasdaun.com';
-
-const contactLinks = [
-  { label: 'WhatsApp Marketing Lina', icon: MessageCircle, href: '' },
-  { label: 'WhatsApp Informasi', icon: MessageCircle, href: '' },
-];
-
-const deliveryLinks = [
-  { label: 'GoFood', icon: Bike, href: '' },
-  { label: 'GrabFood', icon: Bike, href: '' },
-  { label: 'ShopeeFood', icon: ShoppingBag, href: '' },
-];
 
 function LinkButton({ href, icon: Icon, label, featured = false }) {
   const className = `group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-full px-6 ${
@@ -69,18 +55,6 @@ function LinkButton({ href, icon: Icon, label, featured = false }) {
   );
 }
 
-function SectionHeading({ children }) {
-  return (
-    <div className="mb-4 flex items-center justify-center gap-3">
-      <span className="h-px flex-1 bg-daun-300/60" />
-      <h2 className="px-1 font-heading text-lg font-semibold italic text-daun-700">
-        {children}
-      </h2>
-      <span className="h-px flex-1 bg-daun-300/60" />
-    </div>
-  );
-}
-
 export function LinkInBio() {
   const socialLinks = [
     {
@@ -102,7 +76,7 @@ export function LinkInBio() {
       href: `https://www.google.com/search?q=${encodeURIComponent(restaurantInfo.mapsQuery)}`,
     },
     { label: 'Website', icon: Globe2, href: websiteUrl },
-  ];
+  ].filter((link) => link.href);
 
   return (
     <div className="relative isolate flex min-h-screen justify-center overflow-hidden bg-krem-100 font-body text-daun-700 selection:bg-oranye-500 selection:text-white">
@@ -148,28 +122,6 @@ export function LinkInBio() {
             label="Kunjungi Website Kami"
             featured
           />
-        </section>
-
-        <section className="mb-8 w-full" aria-labelledby="contact-links-heading">
-          <SectionHeading>
-            <span id="contact-links-heading">Informasi &amp; Kontak</span>
-          </SectionHeading>
-          <div className="flex flex-col gap-3">
-            {contactLinks.map((link) => (
-              <LinkButton key={link.label} {...link} />
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-10 w-full" aria-labelledby="delivery-links-heading">
-          <SectionHeading>
-            <span id="delivery-links-heading">Pesan via Aplikasi</span>
-          </SectionHeading>
-          <div className="flex flex-col gap-3">
-            {deliveryLinks.map((link) => (
-              <LinkButton key={link.label} {...link} />
-            ))}
-          </div>
         </section>
 
         <footer className="mt-auto flex w-full flex-col items-center">

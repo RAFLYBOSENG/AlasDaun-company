@@ -35,7 +35,7 @@ export function LocationMap() {
               </div>
             </div>
 
-            <div className="flex items-start gap-4">
+            {restaurantInfo.phone && <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-daun-500 text-krem-100">
                 <Phone size={22}/>
               </div>
@@ -46,7 +46,7 @@ export function LocationMap() {
                 </a>
                 <p className="font-body text-sm text-daun-700/60">{restaurantInfo.email}</p>
               </div>
-            </div>
+            </div>}
 
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-daun-500 text-krem-100">
@@ -55,7 +55,6 @@ export function LocationMap() {
               <div>
                 <h3 className="mb-1 font-heading text-lg font-bold text-daun-700">{dict.location.hours}</h3>
                 <p className="font-body text-sm text-daun-700/80">{getOpenHoursText(lang)}</p>
-                {/* [jam buka: 10.00-21.00] placeholder jam operasional, ganti setelah dikonfirmasi */}
               </div>
             </div>
           </div>

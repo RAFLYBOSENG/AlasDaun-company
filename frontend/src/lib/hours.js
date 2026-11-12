@@ -1,12 +1,14 @@
 import { restaurantInfo } from '../data/content';
 export function isOpenNow() {
+    if (restaurantInfo.openHour == null || restaurantInfo.closeHour == null) return null;
     const now = new Date();
     const hour = now.getHours();
-    // [jam buka: 10.00-21.00] — placeholder jam operasional, ganti setelah dikonfirmasi
     return hour >= restaurantInfo.openHour && hour < restaurantInfo.closeHour;
 }
 export function getOpenHoursText(lang) {
-    // [jam buka: 10.00-21.00] — placeholder jam operasional, ganti setelah dikonfirmasi
+    if (restaurantInfo.openHour == null || restaurantInfo.closeHour == null) {
+        return lang === 'id' ? 'Jam operasional belum tersedia' : 'Opening hours are not available yet';
+    }
     return lang === 'id'
         ? `Setiap Hari · ${restaurantInfo.openHour}.00-${restaurantInfo.closeHour}.00 WIB`
         : `Daily · ${restaurantInfo.openHour}:00-${restaurantInfo.closeHour}:00`;

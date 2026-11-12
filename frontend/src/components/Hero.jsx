@@ -26,10 +26,9 @@ export function Hero() {
             <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${open ? 'bg-daun-300' : 'bg-red-400'}`}/>
           </span>
           <span className="font-body text-sm font-medium text-krem-100">
-            {open ? dict.hero.open : dict.hero.closed}
+            {open == null ? dict.hero.hoursUnavailable : (open ? dict.hero.open : dict.hero.closed)}
           </span>
           <Clock size={14} className="text-krem-100/70"/>
-          {/* [jam buka: 10.00-21.00] placeholder jam operasional */}
         </div>
 
         {/* Sundanese greeting */}

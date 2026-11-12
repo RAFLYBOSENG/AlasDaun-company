@@ -44,15 +44,54 @@ export const restaurantInfo = {
     taglineId: 'Sensasi Makan Tanpa Piring',
     taglineEn: 'The No-Plate Dining Sensation',
     address: 'Jl. Citarum No. 34, Bandung',
+    openHour: 9,
+    closeHour: 22,
     phone: '022 723 1101',
-    phoneIntl: '+62227231101',
-    whatsapp: '6281234567890', // placeholder for WhatsApp business number
+    phoneIntl: '+62 812 3456 7890',
+    whatsapp: '081234567890',
     email: 'admin@alasdaun.com',
     instagram: 'alas.daun',
-    facebook: 'AlasDaunBdg',
+    facebook: 'alasdaun',
     youtubeVideoId: 'Du9jdliX9Zk',
-    // [jam buka: 10.00-21.00] — placeholder jam operasional, ganti setelah dikonfirmasi
-    openHour: 10,
-    closeHour: 21,
     mapsQuery: 'Alas Daun, Jl. Citarum No. 34, Bandung',
+};
+
+export const companyProfile = {
+    founded: '15 April 2011',
+    locationStory: 'Kota Bandung',
+    storyId: [
+        'Didirikan pada 15 April 2011 di Kota Bandung, Rumah Makan Alas Daun hadir sebagai destinasi kuliner yang menawarkan pengalaman makan khas Indonesia yang berbeda.',
+        'Berlokasi di Jalan Citarum No. 34, tepat di kawasan strategis Gedung Sate dan Gasibu Bandung, Alas Daun menempati bangunan berarsitektur kolonial yang menghadirkan suasana hangat dan autentik.',
+        'Nama “Alas Daun” dipilih sesuai dengan konsep utama yang diusung, yaitu menyajikan pengalaman makan menggunakan alas daun pisang sebagai pengganti piring. Konsep ini menghidupkan kembali tradisi makan khas nenek moyang Indonesia yang sarat akan nilai kebersamaan, kesederhanaan, dan keakraban.',
+    ],
+    storyEn: [
+        'Founded on 15 April 2011 in Bandung, Rumah Makan Alas Daun offers a distinctive Indonesian dining experience.',
+        'Located at Jalan Citarum No. 34, near Gedung Sate and Gasibu Bandung, Alas Daun occupies a colonial-style building with a warm and authentic atmosphere.',
+        'The name “Alas Daun” reflects our signature concept: dining on banana leaves instead of plates, reviving an Indonesian tradition rooted in togetherness, simplicity, and warmth.',
+    ],
+    milestones: [
+        '15 April 2011 – Rumah Makan Alas Daun resmi berdiri di Bandung.',
+        '2018 – Meraih penghargaan Restoran Terbaik pada Ajang Anugerah Pesona Pariwisata Kota Bandung.',
+        '2020 – Mendapatkan penghargaan Traveller’s Choice dari Tripadvisor.',
+        'Mendapatkan Sertifikasi CHSE.',
+    ],
+    visionId: 'Menjadi restoran pilihan utama untuk menikmati hidangan tradisional Indonesia dengan suasana autentik.',
+    visionEn: 'To become the first choice for traditional Indonesian cuisine in an authentic atmosphere.',
+    missionId: [
+        'Menyajikan makanan berkualitas dengan bahan-bahan segar dan resep tradisional.',
+        'Memberikan pelayanan terbaik dan ramah kepada setiap pelanggan.',
+        'Menciptakan suasana makan yang nyaman dan menyenangkan bagi keluarga dan semua kalangan.',
+    ],
+    missionEn: [
+        'Serve quality food made with fresh ingredients and traditional recipes.',
+        'Provide the best, friendliest service to every guest.',
+        'Create a comfortable and enjoyable dining atmosphere for families and everyone.',
+    ],
+    philosophyId: ['Kesederhanaan', 'Kerendahan hati', 'Ketulusan', 'Kebermanfaatan bagi banyak orang', 'Kebersamaan'],
+    philosophyEn: ['Simplicity', 'Humility', 'Sincerity', 'Being beneficial to others', 'Togetherness'],
+    signatureDishes: ['Ayam Seuhah', 'Barakuda Bakar Bambu', 'Tumis Bunga Pepaya', 'Ayam Sibuluh', 'Tutut Bumbu Kuning'],
+    signatureBeverages: ['Es Karembong Kayas', 'Es Dawegan Sangkuriang', 'Bandrek', 'Es Cincau Tradisional'],
+    capacity: '260 Seats',
+    areas: ['Indoor Dining Area', 'VIP Room', 'Meeting Room'],
+    facilities: ['Area Parkir Luas', 'Mushola', 'Toilet', 'WiFi', 'AC pada VIP Room dan Meeting Room', 'Kursi Bayi', 'Pembayaran Debit, Kredit dan QRIS', 'Reservasi', 'Catering Service', 'Delivery Service', 'GoFood, GrabFood dan ShopeeFood'],
 };

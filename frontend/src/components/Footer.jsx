@@ -49,27 +49,27 @@ export function Footer() {
                 <MapPin size={16} className="mt-0.5 flex-shrink-0 text-oranye-300"/>
                 <span>{restaurantInfo.address}</span>
               </li>
-              <li className="flex items-center gap-2">
+              {restaurantInfo.phone && <li className="flex items-center gap-2">
                 <Phone size={16} className="flex-shrink-0 text-oranye-300"/>
                 <a href={`tel:${restaurantInfo.phoneIntl}`} className="transition hover:text-oranye-300">{restaurantInfo.phone}</a>
-              </li>
-              <li className="flex items-center gap-2">
+              </li>}
+              {restaurantInfo.email && <li className="flex items-center gap-2">
                 <Mail size={16} className="flex-shrink-0 text-oranye-300"/>
                 <a href={`mailto:${restaurantInfo.email}`} className="transition hover:text-oranye-300">{restaurantInfo.email}</a>
-              </li>
+              </li>}
             </ul>
 
-            <h4 className="mb-3 mt-6 font-heading text-base font-bold text-krem-100">{dict.footer.follow}</h4>
+            {restaurantInfo.instagram || restaurantInfo.facebook || restaurantInfo.youtubeVideoId ? <h4 className="mb-3 mt-6 font-heading text-base font-bold text-krem-100">{dict.footer.follow}</h4> : null}
             <div className="flex gap-3">
-              <a href={`https://instagram.com/${restaurantInfo.instagram}`} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-700 text-krem-100 transition hover:bg-oranye-500">
+              {restaurantInfo.instagram && <a href={`https://instagram.com/${restaurantInfo.instagram}`} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-700 text-krem-100 transition hover:bg-oranye-500">
                 <Instagram size={18}/>
-              </a>
-              <a href={`https://facebook.com/${restaurantInfo.facebook}`} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-700 text-krem-100 transition hover:bg-oranye-500">
+              </a>}
+              {restaurantInfo.facebook && <a href={`https://facebook.com/${restaurantInfo.facebook}`} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-700 text-krem-100 transition hover:bg-oranye-500">
                 <Facebook size={18}/>
-              </a>
-              <a href={`https://youtube.com/watch?v=${restaurantInfo.youtubeVideoId}`} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-700 text-krem-100 transition hover:bg-oranye-500">
+              </a>}
+              {restaurantInfo.youtubeVideoId && <a href={`https://youtube.com/watch?v=${restaurantInfo.youtubeVideoId}`} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="flex h-10 w-10 items-center justify-center rounded-full bg-daun-700 text-krem-100 transition hover:bg-oranye-500">
                 <Youtube size={18}/>
-              </a>
+              </a>}
             </div>
             <a
               href="/links"
