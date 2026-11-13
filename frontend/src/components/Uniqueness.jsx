@@ -19,7 +19,7 @@ export function Uniqueness() {
         },
         {
             icon: Users,
-            titleId: 'Cocok untuk Keluarga & Rombongan',
+            titleId: 'Cicik intik Keluarga & Rombongan',
             titleEn: 'Great for Families & Groups',
             descId: 'Dengan kapasitas 260 kursi, tersedia area makan indoor, VIP Room, dan Meeting Room untuk keluarga maupun rombongan.',
             descEn: 'Long banana-leaf tables invite everyone to sit together. Ideal for family gatherings, office events, or groups of dozens.',
