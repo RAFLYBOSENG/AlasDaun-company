@@ -3,6 +3,22 @@
 Frontend React dengan JavaScript (JS/JSX) untuk website RM Alas Daun. Vite
 menjalankan development server dan Tailwind CSS menangani styling.
 
+## Konfigurasi chatbot
+
+Kode chatbot n8n dipisahkan di [`src/chatbot/`](src/chatbot/):
+
+- [`config.js`](src/chatbot/config.js) — URL webhook dan pesan awal.
+- [`index.js`](src/chatbot/index.js) — memuat widget dan menyembunyikannya di halaman admin.
+
+Untuk mengganti API/webhook tanpa mengubah source code, buat file `frontend/.env`
+atau isi environment variable deployment berikut:
+
+```env
+VITE_CHATBOT_WEBHOOK_URL=https://alamat-api-atau-webhook-anda
+```
+
+`VITE_ADMIN_PATH` juga dapat diisi jika jalur halaman admin diubah.
+
 ## Menjalankan
 
 ```bash
