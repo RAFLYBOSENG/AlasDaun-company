@@ -138,7 +138,7 @@ export function MenuSection() {
     const packageItems = menuItems.filter((item) => item.category === 'paketan');
     const alaCarteItems = menuItems.filter((item) => item.category === 'ala-carte');
     const drinkItems = menuItems.filter((item) => item.category === 'minuman');
-    const dessertItems = menuItems.filter((item) => item.category === 'hidangan-penutup');
+    const breakfastItems = menuItems.filter((item) => item.category === 'sarapan');
     const filteredAll = useMemo(() => (
         menuItems.filter((item) => {
             if (item.category === 'paketan') return false;
@@ -272,8 +272,8 @@ export function MenuSection() {
             {drinkItems.length > 0 && (
               <MenuCategoryCard title={lang === 'id' ? 'Menu Minuman' : 'Beverages'} items={drinkItems} onClick={() => { setAllCategory('minuman'); setAllSubcategory('all'); setShowAll(true); }} staggerDelay={3900} />
             )}
-            {dessertItems.length > 0 && (
-              <MenuCategoryCard title={lang === 'id' ? 'Hidangan Penutup' : 'Desserts'} items={dessertItems} onClick={() => { setAllCategory('hidangan-penutup'); setAllSubcategory('all'); setShowAll(true); }} staggerDelay={5200} />
+            {breakfastItems.length > 0 && (
+              <MenuCategoryCard title={lang === 'id' ? 'Menu Sarapan' : 'Breakfast'} items={breakfastItems} onClick={() => { setAllCategory('sarapan'); setAllSubcategory('all'); setShowAll(true); }} staggerDelay={5200} />
             )}
           </div>
         )}

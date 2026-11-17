@@ -4,7 +4,7 @@ const MENU_TABLES = Object.freeze({
   'ala-carte': 'menu_ala_carte',
   paketan: 'menu_paketan',
   minuman: 'menu_minuman',
-  'hidangan-penutup': 'menu_hidangan_penutup',
+  sarapan: 'menu_sarapan',
 });
 
 export const MENU_CATEGORIES = Object.freeze(Object.keys(MENU_TABLES));

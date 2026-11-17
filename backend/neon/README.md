@@ -16,6 +16,8 @@
    membuat tabel galeri dan mengimpor galeri awal.
    Jalankan [`testimonials-schema.sql`](./testimonials-schema.sql) untuk
    membuat tabel ulasan dan keyword moderasi.
+   Jalankan [`site-content-schema.sql`](./site-content-schema.sql) untuk
+   membuat konten tagline dan filosofi yang dapat diedit dari admin.
 
 3. Simpan connection string sebagai `DATABASE_URL` hanya di backend:
 
@@ -30,10 +32,12 @@ ke Neon.
 ## Menyiapkan menu dan admin
 
 Schema membuat tabel `admins` dan empat tabel menu terpisah:
-`menu_ala_carte`, `menu_paketan`, `menu_minuman`, dan
-`menu_hidangan_penutup`. Jalankan schema sebelum membuat admin atau mengisi menu.
+`menu_ala_carte`, `menu_paketan`, `menu_minuman`, dan `menu_sarapan`. Jalankan
+schema sebelum membuat admin atau mengisi menu.
 Kategori menu dibatasi ke `ala-carte`, `paketan`, `minuman`, dan
-`hidangan-penutup`. Setiap tabel juga memiliki kolom `subcategory` untuk filter
+`sarapan`. Jika schema lama memiliki `menu_hidangan_penutup`, schema baru
+memindahkan tabel tersebut menjadi `menu_sarapan` dan memperbarui kategorinya.
+Setiap tabel juga memiliki kolom `subcategory` untuk filter
 internal, misalnya `ayam-bebek`, `ikan`, `jeroan`, atau `minuman-dingin`.
 Subkategori baru dapat dibuat dari form admin menggunakan slug baru.
 
@@ -83,10 +87,10 @@ FROM public.menu_items
 WHERE category = 'minuman'
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.menu_hidangan_penutup
+INSERT INTO public.menu_sarapan
   (id, name, category, subcategory, price, description_id, description_en, image_url,
    is_recommended, is_new, promo, is_active, sort_order, created_at, updated_at)
-SELECT id, name, 'hidangan-penutup', 'lainnya', price, description_id, description_en, image_url,
+SELECT id, name, 'sarapan', 'lainnya', price, description_id, description_en, image_url,
   is_recommended, is_new, promo, is_active, sort_order, created_at, updated_at
 FROM public.menu_items
 WHERE category = 'oleh-oleh'
@@ -125,7 +129,7 @@ ALTER TABLE public.menu_paketan
   ADD COLUMN IF NOT EXISTS subcategory text NOT NULL DEFAULT 'paketan';
 ALTER TABLE public.menu_minuman
   ADD COLUMN IF NOT EXISTS subcategory text NOT NULL DEFAULT 'minuman-signature';
-ALTER TABLE public.menu_hidangan_penutup
+ALTER TABLE public.menu_sarapan
   ADD COLUMN IF NOT EXISTS subcategory text NOT NULL DEFAULT 'lainnya';
 
 UPDATE public.menu_ala_carte

@@ -4,6 +4,7 @@ import { apiRequest } from '../lib/api';
 import { GalleryAdmin } from './GalleryAdmin';
 import { TestimonialsAdmin } from './TestimonialsAdmin';
 import { MenuAdmin } from './MenuAdmin';
+import { SiteContentAdmin } from './SiteContentAdmin';
 
 const emptyMenu = {
   name: '',
@@ -451,6 +452,15 @@ export function Admin() {
           >
             Kelola Ulasan
           </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'content'}
+            onClick={() => setActiveTab('content')}
+            className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition sm:flex-none sm:px-6 ${activeTab === 'content' ? 'bg-daun-600 text-white' : 'text-daun-600 hover:bg-daun-50'}`}
+          >
+            Konten Website
+          </button>
         </div>
 
         {activeTab === 'menu' && <MenuAdmin />}
@@ -469,6 +479,7 @@ export function Admin() {
             <TestimonialsAdmin onError={setError} onNotice={setNotice} />
           </>
         )}
+        {activeTab === 'content' && <SiteContentAdmin />}
       </section>
     </main>
   );

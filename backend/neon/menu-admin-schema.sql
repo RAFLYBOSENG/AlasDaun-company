@@ -25,6 +25,41 @@ END;
 $$;
 
 DO $$
+BEGIN
+  IF to_regclass('public.menu_hidangan_penutup') IS NOT NULL
+    AND to_regclass('public.menu_sarapan') IS NULL THEN
+    ALTER TABLE public.menu_hidangan_penutup
+      DROP CONSTRAINT IF EXISTS menu_hidangan_penutup_category_check;
+    ALTER TABLE public.menu_hidangan_penutup RENAME TO menu_sarapan;
+    UPDATE public.menu_sarapan SET category = 'sarapan';
+    ALTER TABLE public.menu_sarapan
+      ADD CONSTRAINT menu_sarapan_category_check CHECK (category = 'sarapan');
+  END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS public.site_content (
+  content_key text PRIMARY KEY,
+  value_id jsonb NOT NULL,
+  value_en jsonb NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.site_content (content_key, value_id, value_en)
+VALUES
+  (
+    'uniquenessTagline',
+    '"Bukan sekadar makan — ini adalah pengalaman."'::jsonb,
+    '"Not just a meal — an experience."'::jsonb
+  ),
+  (
+    'philosophy',
+    '["Kesederhanaan", "Kerendahan hati", "Ketulusan", "Kebermanfaatan bagi banyak orang", "Kebersamaan"]'::jsonb,
+    '["Simplicity", "Humility", "Sincerity", "Being beneficial to others", "Togetherness"]'::jsonb
+  )
+ON CONFLICT (content_key) DO NOTHING;
+
+DO $$
 DECLARE
   menu_table text;
   menu_category text;
@@ -34,7 +69,7 @@ BEGIN
       ('menu_ala_carte', 'ala-carte'),
       ('menu_paketan', 'paketan'),
       ('menu_minuman', 'minuman'),
-      ('menu_hidangan_penutup', 'hidangan-penutup')
+      ('menu_sarapan', 'sarapan')
     ) AS menu_tables(table_name, category)
   LOOP
     EXECUTE format($sql$

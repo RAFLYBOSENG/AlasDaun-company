@@ -22,7 +22,7 @@ try {
       SELECT id FROM public.menu_ala_carte
       UNION ALL SELECT id FROM public.menu_paketan
       UNION ALL SELECT id FROM public.menu_minuman
-      UNION ALL SELECT id FROM public.menu_hidangan_penutup
+      UNION ALL SELECT id FROM public.menu_sarapan
     ) AS all_menu_items
   `);
   if (existing.rows[0].count > 0) {

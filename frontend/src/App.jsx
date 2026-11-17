@@ -12,6 +12,7 @@ import { LocationMap } from './components/LocationMap';
 import { Footer } from './components/Footer';
 import { AnimatedSection } from './components/AnimatedSection';
 import { LinkInBio } from './components/LinkInBio';
+import { apiRequest } from './lib/api';
 
 const DEFAULT_ADMIN_PATH = '/Admin-PAlasDaun';
 const configuredAdminPath = import.meta.env.VITE_ADMIN_PATH?.trim();
@@ -26,13 +27,29 @@ function isAdminPath(pathname) {
 }
 
 function MainSite() {
+    const [siteContent, setSiteContent] = useState(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        apiRequest('/api/content')
+            .then((result) => {
+                if (!cancelled) setSiteContent(result.data);
+            })
+            .catch((error) => {
+                console.error('Konten situs gagal dimuat.', error);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
     return (<div className="min-w-0 overflow-x-hidden">
       <Navbar />
       <main>
         <AnimatedSection><Hero /></AnimatedSection>
-        <AnimatedSection delay={0.05}><Uniqueness /></AnimatedSection>
+        <AnimatedSection delay={0.05}><Uniqueness tagline={siteContent?.uniquenessTagline} /></AnimatedSection>
         <AnimatedSection><MenuSection /></AnimatedSection>
-        <AnimatedSection delay={0.05}><About /></AnimatedSection>
+        <AnimatedSection delay={0.05}><About philosophyContent={siteContent?.philosophy} /></AnimatedSection>
         <AnimatedSection><Gallery /></AnimatedSection>
         <AnimatedSection delay={0.05}><Testimonials /></AnimatedSection>
         <AnimatedSection><LocationMap /></AnimatedSection>

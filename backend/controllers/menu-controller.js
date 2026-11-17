@@ -61,7 +61,7 @@ function validateMenuItem(body) {
 
   if (!name || name.length > 120) return 'Nama menu wajib diisi (maksimal 120 karakter).';
   if (!MENU_CATEGORIES.includes(category)) {
-    return 'Kategori harus berupa ala-carte, paketan, minuman, atau hidangan-penutup.';
+    return 'Kategori harus berupa ala-carte, paketan, minuman, atau sarapan.';
   }
   if (!subcategory || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(subcategory) || subcategory.length > 60) {
     return 'Subkategori harus berupa slug, misalnya ayam-bebek atau minuman-dingin.';

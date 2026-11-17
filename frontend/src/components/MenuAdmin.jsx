@@ -21,7 +21,7 @@ const menuCategories = [
   ['ala-carte', 'Menu Ala Carte'],
   ['paketan', 'Menu Paketan'],
   ['minuman', 'Menu Minuman'],
-  ['hidangan-penutup', 'Hidangan Penutup'],
+  ['sarapan', 'Menu Sarapan'],
 ];
 
 function readFileAsBase64(file) {

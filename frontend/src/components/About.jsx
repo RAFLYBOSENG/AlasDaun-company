@@ -1,10 +1,11 @@
 import { useLang } from '../lib/language-context';
 import { companyProfile, restaurantInfo } from '../data/content';
-export function About() {
+export function About({ philosophyContent }) {
     const { lang, dict } = useLang();
     const story = lang === 'id' ? companyProfile.storyId : companyProfile.storyEn;
     const mission = lang === 'id' ? companyProfile.missionId : companyProfile.missionEn;
-    const philosophy = lang === 'id' ? companyProfile.philosophyId : companyProfile.philosophyEn;
+    const philosophy = philosophyContent?.[lang]
+      || (lang === 'id' ? companyProfile.philosophyId : companyProfile.philosophyEn);
     return (<section id="tentang" className="bg-krem-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">

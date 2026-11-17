@@ -3,11 +3,26 @@ import {
   Globe2,
   Instagram,
   Search,
+  ShoppingBag,
   Youtube,
 } from 'lucide-react';
 import { restaurantInfo } from '../data/content';
 
 const websiteUrl = 'https://www.alasdaun.com';
+const deliveryLinks = [
+  {
+    label: 'Pesan via GoFood',
+    href: 'https://gofood.co.id/bandung/restaurant/alas-daun-7b6381cc-9a24-4448-bb0a-44fb4d42cdd1',
+  },
+  {
+    label: 'Pesan via GrabFood',
+    href: 'https://grab.onelink.me/2695613898?pid=inappsharing&c=IDGFSTI00000nu8&is_retargeting=true&af_dp=grab%3A%2F%2Fopen%3FscreenType%3DGRABFOOD%26sourceID%3DA4pcqCZkS4%26merchantIDs%3DIDGFSTI00000nu8&af_force_deeplink=true&af_web_dp=https%3A%2F%2Fwww.grab.com%2Fdownload',
+  },
+  {
+    label: 'Pesan via ShopeeFood',
+    href: 'https://shopee.co.id/universal-link/now-food/shop/20119433?deep_and_deferred=1&share',
+  },
+];
 
 function LinkButton({ href, icon: Icon, label, featured = false }) {
   const className = `group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-full px-6 ${
@@ -122,6 +137,12 @@ export function LinkInBio() {
             label="Kunjungi Website Kami"
             featured
           />
+        </section>
+
+        <section className="mb-8 flex w-full flex-col gap-3" aria-label="Pesan online">
+          {deliveryLinks.map(({ label, href }) => (
+            <LinkButton key={label} href={href} icon={ShoppingBag} label={label} />
+          ))}
         </section>
 
         <footer className="mt-auto flex w-full flex-col items-center">

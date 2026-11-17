@@ -1,6 +1,6 @@
 import { Leaf, Infinity, Users, Globe2 } from 'lucide-react';
 import { useLang } from '../lib/language-context';
-export function Uniqueness() {
+export function Uniqueness({ tagline }) {
     const { lang, dict } = useLang();
     const features = [
         {
@@ -36,7 +36,7 @@ export function Uniqueness() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{dict.uniq.title}</p>
-          <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{dict.uniq.subtitle}</h2>
+          <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{tagline?.[lang] || dict.uniq.subtitle}</h2>
           <div className="mx-auto h-1 w-20 rounded-full bg-oranye-500"/>
         </div>
 

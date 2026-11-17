@@ -2,7 +2,7 @@ export const categoryLabels = {
     'ala-carte': { id: 'Menu Ala Carte', en: 'A La Carte' },
     paketan: { id: 'Menu Paketan', en: 'Meal Packages' },
     'minuman': { id: 'Minuman', en: 'Beverages' },
-    'hidangan-penutup': { id: 'Hidangan Penutup', en: 'Desserts' },
+    sarapan: { id: 'Menu Sarapan', en: 'Breakfast' },
 };
 export const subcategoryLabels = {
     'ayam-bebek': { id: 'Ayam & Bebek', en: 'Chicken & Duck' },
@@ -188,11 +188,11 @@ export const menuItems = [
         descriptionEn: 'Freshly squeezed orange with ice, sweet-tart refreshment to balance the heat.',
         image: 'https://images.pexels.com/photos/39508622/pexels-photo-39508622.png?auto=compress&cs=tinysrgb&h=650&w=940',
     },
-    // Oleh-oleh
+    // Sarapan
     {
         id: 'kacang-roay',
         name: 'Kacang Roay',
-        category: 'hidangan-penutup',
+        category: 'sarapan',
         subcategory: 'lainnya',
         price: 35000,
         descriptionId: 'Kacang tanah sangrai dengan bumbu pedas manis, camilan klasik yang sukar ditolak.',

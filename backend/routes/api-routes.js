@@ -21,6 +21,11 @@ import {
   uploadMenuImage,
 } from '../controllers/menu-controller.js';
 import {
+  listAdminSiteContent,
+  listSiteContent,
+  updateSiteContent,
+} from '../controllers/site-content-controller.js';
+import {
   createBlockedKeyword,
   createTestimonial,
   deleteBlockedKeyword,
@@ -39,6 +44,7 @@ const routes = [
   { method: 'GET', path: '/api/menu', handler: () => listMenu() },
   { method: 'GET', path: '/api/gallery', handler: () => listGallery() },
   { method: 'GET', path: '/api/testimonials', handler: () => listPublicTestimonials() },
+  { method: 'GET', path: '/api/content', handler: () => listSiteContent() },
   { method: 'POST', path: '/api/testimonials', handler: ({ body }) => createTestimonial(body) },
   { method: 'GET', path: '/api/admin/testimonials', handler: ({ request }) => listAdminTestimonials(request) },
   { method: 'GET', path: '/api/admin/testimonial-keywords', handler: ({ request }) => listBlockedKeywords(request) },
@@ -48,6 +54,7 @@ const routes = [
   { method: 'POST', path: '/api/admin/gallery', handler: ({ request, body }) => createGallery(request, body) },
   { method: 'POST', path: '/api/admin/menu/image', handler: ({ request, body }) => uploadMenuImage(request, body) },
   { method: 'GET', path: '/api/admin/menu', handler: ({ request }) => listAdminMenu(request) },
+  { method: 'GET', path: '/api/admin/content', handler: ({ request }) => listAdminSiteContent(request) },
   { method: 'POST', path: '/api/admin/menu', handler: ({ request, body }) => createMenu(request, body) },
   {
     method: 'PUT',
@@ -78,6 +85,11 @@ const routes = [
     method: 'DELETE',
     match: /^\/api\/admin\/testimonials\/([^/]+)$/,
     handler: ({ request, match }) => deleteTestimonial(request, match[1]),
+  },
+  {
+    method: 'PUT',
+    match: /^\/api\/admin\/content\/([^/]+)$/,
+    handler: ({ request, body, match }) => updateSiteContent(request, body, match[1]),
   },
   {
     method: 'DELETE',
