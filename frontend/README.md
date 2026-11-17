@@ -14,7 +14,7 @@ Untuk mengganti API/webhook tanpa mengubah source code, buat file `frontend/.env
 atau isi environment variable deployment berikut:
 
 ```env
-VITE_CHATBOT_WEBHOOK_URL=https://alamat-api-atau-webhook-anda
+VITE_CHATBOT_WEBHOOK_URL=https://n8n-mtsmmsupz1vc.jkt4.sumopod.my.id/webhook/dc522045-59c8-4dac-b983-a02e1575e0fb/chat
 ```
 
 `VITE_ADMIN_PATH` juga dapat diisi jika jalur halaman admin diubah.

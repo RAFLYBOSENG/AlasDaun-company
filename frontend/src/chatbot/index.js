@@ -1,6 +1,6 @@
 import { chatbotConfig } from './config';
 
-const CHAT_BUNDLE_URL = 'https://n8n-mtsmmsupz1vc.jkt4.sumopod.my.id/webhook/dc522045-59c8-4dac-b983-a02e1575e0fb/chat';
+const CHAT_BUNDLE_URL = 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
 function isAdminRoute() {
   const adminPath = chatbotConfig.adminPath.replace(/\/+$/, '') || '/Admin-PAlasDaun';
@@ -10,19 +10,19 @@ function isAdminRoute() {
     || window.location.hash.startsWith(`#${adminPath}/`);
 }
 
-function initChat() {
+async function initChat() {
   const chatOptions = {
     webhookUrl: chatbotConfig.webhookUrl,
     initialMessages: chatbotConfig.initialMessages,
     i18n: chatbotConfig.i18n,
   };
-  const moduleScript = document.createElement('script');
-  moduleScript.type = 'module';
-  moduleScript.textContent = `
-    import { createChat } from '${CHAT_BUNDLE_URL}';
-    createChat(${JSON.stringify(chatOptions)});
-  `;
-  document.body.appendChild(moduleScript);
+
+  try {
+    const { createChat } = await import(/* @vite-ignore */ CHAT_BUNDLE_URL);
+    createChat(chatOptions);
+  } catch (error) {
+    console.error('Chatbot Alas Daun gagal dimuat.', error);
+  }
 }
 
 function syncChatVisibility() {

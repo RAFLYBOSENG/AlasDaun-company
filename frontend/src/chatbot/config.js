@@ -8,10 +8,14 @@ export const chatbotConfig = {
   initialMessages: [
     'Selamat datang di Virtual Assistan Alas Daun. ada yang bisa kami bantu?',
   ],
+  defaultLanguage: 'en',
   i18n: {
     en: {
       title: 'Asisten Alas Daun 👋',
       subtitle: 'Selamat datang! Kami siap membantu Anda.',
+      footer: '',
+      getStarted: 'Mulai Percakapan Baru',
+      inputPlaceholder: 'Tulis pertanyaan Anda...',
     },
   },
 };
