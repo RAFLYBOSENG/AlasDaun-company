@@ -47,7 +47,13 @@ function MainSite() {
       <Navbar />
       <main>
         <AnimatedSection><Hero /></AnimatedSection>
-        <AnimatedSection delay={0.05}><Uniqueness tagline={siteContent?.uniquenessTagline} /></AnimatedSection>
+        <AnimatedSection delay={0.05}>
+          <Uniqueness
+            labelContent={siteContent?.uniquenessLabel}
+            tagline={siteContent?.uniquenessTagline}
+            featureContent={siteContent}
+          />
+        </AnimatedSection>
         <AnimatedSection><MenuSection /></AnimatedSection>
         <AnimatedSection delay={0.05}><About philosophyContent={siteContent?.philosophy} /></AnimatedSection>
         <AnimatedSection><Gallery /></AnimatedSection>

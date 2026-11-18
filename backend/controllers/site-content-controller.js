@@ -3,8 +3,13 @@ import { isAdminRequest } from './auth-controller.js';
 
 const CONTENT_FIELDS = 'content_key AS "key", value_id AS "id", value_en AS "en"';
 const CONTENT_TYPES = {
+  uniquenessLabel: 'text',
   uniquenessTagline: 'text',
   philosophy: 'list',
+  uniquenessFeature1: 'feature',
+  uniquenessFeature2: 'feature',
+  uniquenessFeature3: 'feature',
+  uniquenessFeature4: 'feature',
 };
 
 function response(status, body) {
@@ -32,6 +37,24 @@ function validateValue(key, value) {
       return 'Tagline wajib diisi dan maksimal 500 karakter per bahasa.';
     }
     return { id, en };
+  }
+
+  if (type === 'feature') {
+    const id = value.id && typeof value.id === 'object' ? value.id : {};
+    const en = value.en && typeof value.en === 'object' ? value.en : {};
+    const idTitle = typeof id.title === 'string' ? id.title.trim() : '';
+    const idDescription = typeof id.description === 'string' ? id.description.trim() : '';
+    const enTitle = typeof en.title === 'string' ? en.title.trim() : '';
+    const enDescription = typeof en.description === 'string' ? en.description.trim() : '';
+    if (!idTitle || !idDescription || !enTitle || !enDescription
+      || idTitle.length > 120 || idDescription.length > 1000
+      || enTitle.length > 120 || enDescription.length > 1000) {
+      return 'Judul dan deskripsi kartu wajib diisi; judul maksimal 120 karakter dan deskripsi maksimal 1000 karakter.';
+    }
+    return {
+      id: { title: idTitle, description: idDescription },
+      en: { title: enTitle, description: enDescription },
+    };
   }
 
   const id = Array.isArray(value.id) ? value.id.map((item) => String(item).trim()) : [];

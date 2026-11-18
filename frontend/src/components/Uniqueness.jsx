@@ -1,10 +1,11 @@
 import { Leaf, Infinity, Users, Globe2 } from 'lucide-react';
 import { useLang } from '../lib/language-context';
-export function Uniqueness({ tagline }) {
+export function Uniqueness({ labelContent, tagline, featureContent }) {
     const { lang, dict } = useLang();
     const features = [
         {
             icon: Leaf,
+            contentKey: 'uniquenessFeature1',
             titleId: 'Makan Tanpa Piring',
             titleEn: 'No-Plate Dining',
             descId: 'Setiap meja dialasi daun pisang segar sebagai pengganti piring, menghadirkan pengalaman makan tradisional yang autentik dan akrab.',
@@ -12,6 +13,7 @@ export function Uniqueness({ tagline }) {
         },
         {
             icon: Infinity,
+            contentKey: 'uniquenessFeature2',
             titleId: 'Nasi & Kuah Boleh Nambah',
             titleEn: 'Unlimited Rice & Gravy',
             descId: 'Pramusaji berkeliling menyajikan nasi serta kuah sesuai porsi yang diinginkan pelanggan, menghadirkan kebersamaan di setiap meja.',
@@ -19,6 +21,7 @@ export function Uniqueness({ tagline }) {
         },
         {
             icon: Users,
+            contentKey: 'uniquenessFeature3',
             titleId: 'Cocok untuk Keluarga & Rombongan',
             titleEn: 'Great for Families & Groups',
             descId: 'Dengan kapasitas 260 kursi, tersedia area makan indoor, VIP Room, dan Meeting Room untuk keluarga maupun rombongan.',
@@ -26,6 +29,7 @@ export function Uniqueness({ tagline }) {
         },
         {
             icon: Globe2,
+            contentKey: 'uniquenessFeature4',
             titleId: 'Cita Rasa Nusantara',
             titleEn: 'Flavors of the Archipelago',
             descId: 'Nikmati hidangan tradisional Indonesia dengan bahan segar dan resep tradisional dalam suasana autentik.',
@@ -35,7 +39,7 @@ export function Uniqueness({ tagline }) {
     return (<section id="keunikan" className="bg-krem-100 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{dict.uniq.title}</p>
+          <p className="mb-2 font-body text-sm font-semibold uppercase tracking-widest text-oranye-500">{labelContent?.[lang] || dict.uniq.title}</p>
           <h2 className="mb-3 font-heading text-3xl font-bold text-daun-600 sm:text-4xl">{tagline?.[lang] || dict.uniq.subtitle}</h2>
           <div className="mx-auto h-1 w-20 rounded-full bg-oranye-500"/>
         </div>
@@ -50,10 +54,10 @@ export function Uniqueness({ tagline }) {
                     <Icon size={26}/>
                   </div>
                   <h3 className="mb-3 font-heading text-xl font-bold text-daun-700">
-                    {lang === 'id' ? f.titleId : f.titleEn}
+                    {featureContent?.[f.contentKey]?.[lang]?.title || (lang === 'id' ? f.titleId : f.titleEn)}
                   </h3>
                   <p className="font-body text-sm leading-relaxed text-daun-800/80">
-                    {lang === 'id' ? f.descId : f.descEn}
+                    {featureContent?.[f.contentKey]?.[lang]?.description || (lang === 'id' ? f.descId : f.descEn)}
                   </p>
                 </div>
               </div>);
