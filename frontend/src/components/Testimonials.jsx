@@ -1,38 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 import { useLang } from '../lib/language-context';
-import { testimonials as fallbackTestimonials } from '../data/content';
 import { apiRequest } from '../lib/api';
 
-function avatarFor(name) {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=86A760&color=fff`;
-}
-
 export function Testimonials() {
-    const { lang, dict } = useLang();
-    const [items, setItems] = useState(fallbackTestimonials);
-    const [idx, setIdx] = useState(0);
+    const { dict } = useLang();
     const [form, setForm] = useState({ name: '', rating: 5, text: '' });
     const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState('');
-    const count = items.length;
-    const go = useCallback((n) => setIdx((current) => count ? (current + n + count) % count : 0), [count]);
-    const next = useCallback(() => go(1), [go]);
-    const prev = useCallback(() => go(-1), [go]);
-
-    useEffect(() => {
-        apiRequest('/api/testimonials')
-            .then((result) => {
-                if (result.data.length) setItems(result.data);
-            })
-            .catch(() => {});
-    }, []);
-
-    useEffect(() => {
-        if (idx >= count) setIdx(0);
-        const interval = setInterval(next, 6000);
-        return () => clearInterval(interval);
-    }, [idx, count, next]);
 
     async function submitReview(event) {
         event.preventDefault();
@@ -63,39 +37,16 @@ export function Testimonials() {
           <div className="mx-auto h-1 w-20 rounded-full bg-oranye-500"/>
         </div>
 
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-          <div className="min-w-0 lg:order-2">
-        {count > 0 && <div className="relative">
-          <div className="overflow-hidden">
-            <div className="flex transition-transform duration-700 ease-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
-              {items.map((tst) => (<div key={tst.id} className="w-full min-w-0 flex-shrink-0 px-1 sm:px-2">
-                  <div className="mx-auto w-full max-w-2xl rounded-2xl bg-krem-100/10 p-5 backdrop-blur-sm ring-1 ring-krem-100/15 sm:rounded-3xl sm:p-10">
-                    <Quote size={36} className="mb-4 text-oranye-300"/>
-                    <div className="mb-4 flex gap-1">
-                      {Array.from({ length: tst.rating }).map((_, i) => <Star key={i} size={18} className="text-oranye-400" fill="currentColor"/>)}
-                    </div>
-                    <p className="mb-6 break-words font-body text-sm leading-relaxed text-krem-100/90 sm:text-base lg:text-lg">"{lang === 'id' ? tst.textId : (tst.textEn || tst.textId)}"</p>
-                    <div className="flex items-center gap-3">
-                      <img src={tst.avatar || avatarFor(tst.name)} alt={tst.name} loading="lazy" className="h-12 w-12 rounded-full object-cover ring-2 ring-oranye-300/40"/>
-                      <div className="min-w-0">
-                        <p className="break-words font-heading text-base font-bold text-krem-100">{tst.name}</p>
-                        <p className="font-body text-xs text-krem-100/60">{lang === 'id' ? 'Pelanggan Alas Daun' : 'Alas Daun Guest'}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>))}
-            </div>
-          </div>
-          <button onClick={prev} className="absolute left-1 top-full mt-3 flex h-9 w-9 items-center justify-center rounded-full bg-krem-100/20 text-krem-100 transition hover:bg-krem-100/30 sm:-left-4 sm:top-1/2 sm:mt-0 sm:h-10 sm:w-10 sm:-translate-y-1/2" aria-label="Previous"><ChevronLeft size={20}/></button>
-          <button onClick={next} className="absolute right-1 top-full mt-3 flex h-9 w-9 items-center justify-center rounded-full bg-krem-100/20 text-krem-100 transition hover:bg-krem-100/30 sm:-right-4 sm:top-1/2 sm:mt-0 sm:h-10 sm:w-10 sm:-translate-y-1/2" aria-label="Next"><ChevronRight size={20}/></button>
-        </div>}
-
-        <div className="mt-8 flex justify-center gap-2">
-          {items.map((_, i) => <button key={i} onClick={() => setIdx(i)} className={`h-2 rounded-full transition-all duration-300 ${i === idx ? 'w-8 bg-oranye-400' : 'w-2 bg-krem-100/30'}`} aria-label={`Slide ${i + 1}`}/>)}
+        <div className="mb-10 overflow-hidden rounded-3xl bg-krem-100 p-3 shadow-xl sm:p-5">
+          <div
+            className="elfsight-app-82b6bdf1-0235-47f3-83af-78a86ec372eb"
+            data-elfsight-app-lazy
+            aria-label="Ulasan Alas Daun"
+          />
         </div>
-          </div>
 
-        <form onSubmit={submitReview} className="mx-auto w-full max-w-2xl rounded-3xl bg-krem-100/10 p-6 ring-1 ring-krem-100/15 sm:p-8 lg:order-1 lg:mt-0">
+        <div className="mx-auto w-full max-w-3xl">
+        <form onSubmit={submitReview} className="rounded-3xl bg-krem-100/10 p-6 ring-1 ring-krem-100/15 sm:p-8">
           <h3 className="font-heading text-2xl font-bold text-krem-100">Bagikan pengalaman Anda</h3>
           <p className="mt-1 text-sm text-krem-100/70">Ulasan akan diperiksa admin sebelum ditampilkan.</p>
           {message && <p role="status" className="mt-4 rounded-lg bg-krem-100/20 px-3 py-2 text-sm text-krem-100">{message}</p>}
