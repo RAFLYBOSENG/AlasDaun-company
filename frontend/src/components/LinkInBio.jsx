@@ -16,11 +16,11 @@ const deliveryLinks = [
   },
   {
     label: 'Pesan via GrabFood',
-    href: 'https://grab.onelink.me/2695613898?pid=inappsharing&c=IDGFSTI00000nu8&is_retargeting=true&af_dp=grab%3A%2F%2Fopen%3FscreenType%3DGRABFOOD%26sourceID%3DA4pcqCZkS4%26merchantIDs%3DIDGFSTI00000nu8&af_force_deeplink=true&af_web_dp=https%3A%2F%2Fwww.grab.com%2Fdownload',
+    href: 'https://app.grab.com/s/gkP5HdIq',
   },
   {
     label: 'Pesan via ShopeeFood',
-    href: 'https://shopee.co.id/universal-link/now-food/shop/20119433?deep_and_deferred=1&share',
+    href: 'https://spf.shopee.co.id/9V38KEsFAg  ',
   },
 ];
 
