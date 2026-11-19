@@ -3,7 +3,7 @@ import { dispatchApiRoute } from './routes/api-routes.js';
 
 config();
 
-const MAX_JSON_BODY_BYTES = 4.25 * 1024 * 1024;
+const MAX_JSON_BODY_BYTES = 96 * 1024 * 1024;
 
 function getBody(request) {
   if (request.body === undefined || request.body === null) return {};

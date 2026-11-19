@@ -6,7 +6,7 @@ config();
 
 const port = Number(process.env.PORT || 3001);
 const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
-const MAX_JSON_BODY_BYTES = 4.25 * 1024 * 1024;
+const MAX_JSON_BODY_BYTES = 96 * 1024 * 1024;
 
 if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL environment variable is not set.');

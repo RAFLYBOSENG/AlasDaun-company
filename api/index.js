@@ -7,7 +7,7 @@ config({ path: ['backend/.env', '.env'] });
 const app = express();
 const frontendOrigin = process.env.FRONTEND_ORIGIN || '*';
 
-app.use(express.json({ limit: '4.25mb' }));
+app.use(express.json({ limit: '96mb' }));
 app.use((request, response, next) => {
   response.setHeader('Access-Control-Allow-Origin', frontendOrigin);
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');

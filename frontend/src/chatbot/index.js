@@ -3,7 +3,10 @@ import { chatbotConfig } from './config';
 const CHAT_BUNDLE_URL = 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
 function isAdminRoute() {
-  const adminPath = chatbotConfig.adminPath.replace(/\/+$/, '') || '/Admin-PAlasDaun';
+  const adminPath = typeof chatbotConfig.adminPath === 'string'
+    ? chatbotConfig.adminPath.replace(/\/+$/, '')
+    : '';
+  if (!adminPath) return false;
   return window.location.pathname === adminPath
     || window.location.pathname === `${adminPath}/`
     || window.location.hash === `#${adminPath}`

@@ -14,16 +14,17 @@ import { AnimatedSection } from './components/AnimatedSection';
 import { LinkInBio } from './components/LinkInBio';
 import { apiRequest } from './lib/api';
 
-const DEFAULT_ADMIN_PATH = '/Admin-PAlasDaun';
 const configuredAdminPath = import.meta.env.VITE_ADMIN_PATH?.trim();
+const DEFAULT_ADMIN_PATH = '/Admin-PAlasDaun';
 const ADMIN_PATH = configuredAdminPath?.startsWith('/')
     && !configuredAdminPath.includes('#')
     && !configuredAdminPath.includes('?')
-    ? configuredAdminPath.replace(/\/+$/, '') || DEFAULT_ADMIN_PATH
+    ? configuredAdminPath.replace(/\/+$/, '')
     : DEFAULT_ADMIN_PATH;
 
 function isAdminPath(pathname) {
-    return pathname === ADMIN_PATH || pathname === `${ADMIN_PATH}/`;
+    return Boolean(ADMIN_PATH)
+      && (pathname === ADMIN_PATH || pathname === `${ADMIN_PATH}/`);
 }
 
 function MainSite() {
@@ -55,7 +56,7 @@ function MainSite() {
           />
         </AnimatedSection>
         <AnimatedSection><MenuSection /></AnimatedSection>
-        <AnimatedSection delay={0.05}><About philosophyContent={siteContent?.philosophy} /></AnimatedSection>
+        <AnimatedSection delay={0.05}><About philosophyContent={siteContent?.philosophy} aboutContent={siteContent?.about} /></AnimatedSection>
         <AnimatedSection><Gallery /></AnimatedSection>
         <AnimatedSection delay={0.05}><Testimonials /></AnimatedSection>
         <AnimatedSection><LocationMap /></AnimatedSection>

@@ -2,6 +2,7 @@ import {
   getSession,
   login,
   logout,
+  validateAdminMutation,
 } from '../controllers/auth-controller.js';
 import { databaseHealth } from '../controllers/health-controller.js';
 import {
@@ -23,6 +24,7 @@ import {
 import {
   listAdminSiteContent,
   listSiteContent,
+  uploadAboutVideo,
   updateSiteContent,
 } from '../controllers/site-content-controller.js';
 import {
@@ -55,6 +57,7 @@ const routes = [
   { method: 'POST', path: '/api/admin/menu/image', handler: ({ request, body }) => uploadMenuImage(request, body) },
   { method: 'GET', path: '/api/admin/menu', handler: ({ request }) => listAdminMenu(request) },
   { method: 'GET', path: '/api/admin/content', handler: ({ request }) => listAdminSiteContent(request) },
+  { method: 'POST', path: '/api/admin/content/about-video', handler: ({ request, body }) => uploadAboutVideo(request, body) },
   { method: 'POST', path: '/api/admin/menu', handler: ({ request, body }) => createMenu(request, body) },
   {
     method: 'PUT',
@@ -107,5 +110,21 @@ export async function dispatchApiRoute(request, path, body = {}) {
   if (!route) return null;
 
   const match = route.match?.exec(path);
-  return route.handler({ request, body, match });
+  if (path.startsWith('/api/admin/') && ['POST', 'PUT', 'DELETE'].includes(method)
+    && !validateAdminMutation(request.headers)) {
+    return {
+      status: 403,
+      body: { error: 'Permintaan admin tidak valid atau sesi kedaluwarsa.' },
+      headers: { 'Cache-Control': 'no-store, private', 'X-Robots-Tag': 'noindex, nofollow' },
+    };
+  }
+  const result = await route.handler({ request, body, match });
+  if (path.startsWith('/api/admin/') || path.startsWith('/api/auth/')) {
+    result.headers = {
+      ...(result.headers || {}),
+      'Cache-Control': 'no-store, private',
+      'X-Robots-Tag': 'noindex, nofollow',
+    };
+  }
+  return result;
 }

@@ -49,6 +49,22 @@ function categorySlug(value) {
 }
 
 export function Admin() {
+  useEffect(() => {
+    const previousTitle = document.title;
+    let robots = document.querySelector('meta[name="robots"]');
+    const createdRobots = !robots;
+    if (!robots) {
+      robots = document.createElement('meta');
+      robots.setAttribute('name', 'robots');
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute('content', 'noindex, nofollow, noarchive');
+    document.title = 'Admin · Alas Daun';
+    return () => {
+      document.title = previousTitle;
+      if (createdRobots) robots.remove();
+    };
+  }, []);
   const [checkingSession, setCheckingSession] = useState(true);
   const [admin, setAdmin] = useState(null);
   const [activeTab, setActiveTab] = useState('menu');
@@ -151,7 +167,10 @@ export function Admin() {
   useEffect(() => {
     apiRequest('/api/auth/session')
       .then((result) => {
-        if (result.authenticated) setAdmin({ email: result.email });
+        if (result.authenticated) {
+          if (result.csrfToken) window.sessionStorage.setItem('alasdaun_csrf', result.csrfToken);
+          setAdmin({ email: result.email });
+        }
         setCheckingSession(false);
       })
       .catch((requestError) => {
@@ -193,6 +212,7 @@ export function Admin() {
           password: formData.get('password'),
         },
       });
+      if (result.csrfToken) window.sessionStorage.setItem('alasdaun_csrf', result.csrfToken);
       setAdmin({ email: result.email });
     } catch (requestError) {
       setError(requestError.message);
@@ -205,6 +225,7 @@ export function Admin() {
     setError('');
     try {
       await apiRequest('/api/auth/logout', { method: 'POST', body: {} });
+      window.sessionStorage.removeItem('alasdaun_csrf');
       setAdmin(null);
       setItems([]);
       setNotice('');

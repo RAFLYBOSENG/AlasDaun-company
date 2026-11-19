@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
 import { apiRequest } from '../lib/api';
+import { companyProfile, restaurantInfo } from '../data/content';
 
 const emptyForm = {
   labelId: '',
@@ -25,6 +26,43 @@ const emptyForm = {
   feature4TitleEn: '',
   feature4DescId: '',
   feature4DescEn: '',
+};
+
+const emptyAbout = {
+  sectionLabelId: 'Tentang Kami',
+  sectionLabelEn: 'About Us',
+  sectionTitleId: 'Filosofi di balik daun pisang.',
+  sectionTitleEn: 'The philosophy behind the banana leaf.',
+  welcomeMessageId: 'Wilujeung sumping, mangga linggih.',
+  welcomeMessageEn: 'Welcome, please have a seat.',
+  founded: companyProfile.founded,
+  locationStory: companyProfile.locationStory,
+  storyId: companyProfile.storyId.join('\n\n'),
+  storyEn: companyProfile.storyEn.join('\n\n'),
+  visionId: companyProfile.visionId,
+  visionEn: companyProfile.visionEn,
+  missionId: companyProfile.missionId.join('\n'),
+  missionEn: companyProfile.missionEn.join('\n'),
+  philosophyId: companyProfile.philosophyId.join('\n'),
+  philosophyEn: companyProfile.philosophyEn.join('\n'),
+  taglineId: restaurantInfo.taglineId,
+  taglineEn: restaurantInfo.taglineEn,
+  diningDescriptionId: 'Setiap meja dialasi daun pisang segar dan pramusaji berkeliling menyajikan nasi serta kuah sesuai porsi yang diinginkan pelanggan.',
+  diningDescriptionEn: 'Every table is covered with fresh banana leaves while servers bring rice and gravy according to each guest’s preference.',
+  milestonesId: companyProfile.milestones.join('\n'),
+  milestonesEn: companyProfile.milestones.map((item) => item.replace('Rumah Makan Alas Daun resmi berdiri di Bandung.', 'Rumah Makan Alas Daun was founded in Bandung.')).join('\n'),
+  signatureDishesId: companyProfile.signatureDishes.join('\n'),
+  signatureDishesEn: companyProfile.signatureDishes.join('\n'),
+  signatureBeveragesId: companyProfile.signatureBeverages.join('\n'),
+  signatureBeveragesEn: companyProfile.signatureBeverages.join('\n'),
+  capacityId: companyProfile.capacity,
+  capacityEn: '260 seats',
+  areasId: companyProfile.areas.join('\n'),
+  areasEn: companyProfile.areas.join('\n'),
+  facilitiesId: companyProfile.facilities.join('\n'),
+  facilitiesEn: companyProfile.facilities.join('\n'),
+  videoUrl: '/vidaboutus/alasdaun.mp4',
+  youtubeUrl: `https://youtu.be/${restaurantInfo.youtubeVideoId}`,
 };
 
 function listToText(value) {
@@ -64,6 +102,8 @@ const featureDefaults = [
 
 export function SiteContentAdmin() {
   const [form, setForm] = useState(emptyForm);
+  const [about, setAbout] = useState(emptyAbout);
+  const [videoFile, setVideoFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -97,6 +137,45 @@ export function SiteContentAdmin() {
           feature4DescId: data.uniquenessFeature4?.id?.description || featureDefaults[3].descId,
           feature4DescEn: data.uniquenessFeature4?.en?.description || featureDefaults[3].descEn,
         });
+        if (data.about) {
+          setAbout({
+            ...emptyAbout,
+            sectionLabelId: data.about.id?.sectionLabel || emptyAbout.sectionLabelId,
+            sectionLabelEn: data.about.en?.sectionLabel || emptyAbout.sectionLabelEn,
+            sectionTitleId: data.about.id?.sectionTitle || emptyAbout.sectionTitleId,
+            sectionTitleEn: data.about.en?.sectionTitle || emptyAbout.sectionTitleEn,
+            welcomeMessageId: data.about.id?.welcomeMessage || emptyAbout.welcomeMessageId,
+            welcomeMessageEn: data.about.en?.welcomeMessage || emptyAbout.welcomeMessageEn,
+            founded: data.about.id?.founded || emptyAbout.founded,
+            locationStory: data.about.id?.locationStory || emptyAbout.locationStory,
+            storyId: listToText(data.about.id?.story).replace(/\n/g, '\n'),
+            storyEn: listToText(data.about.en?.story).replace(/\n/g, '\n'),
+            visionId: data.about.id?.vision || emptyAbout.visionId,
+            visionEn: data.about.en?.vision || emptyAbout.visionEn,
+            missionId: listToText(data.about.id?.mission),
+            missionEn: listToText(data.about.en?.mission),
+            philosophyId: listToText(data.about.id?.philosophy),
+            philosophyEn: listToText(data.about.en?.philosophy),
+            taglineId: data.about.id?.tagline || emptyAbout.taglineId,
+            taglineEn: data.about.en?.tagline || emptyAbout.taglineEn,
+            diningDescriptionId: data.about.id?.diningDescription || emptyAbout.diningDescriptionId,
+            diningDescriptionEn: data.about.en?.diningDescription || emptyAbout.diningDescriptionEn,
+            milestonesId: listToText(data.about.id?.milestones),
+            milestonesEn: listToText(data.about.en?.milestones),
+            signatureDishesId: listToText(data.about.id?.signatureDishes),
+            signatureDishesEn: listToText(data.about.en?.signatureDishes),
+            signatureBeveragesId: listToText(data.about.id?.signatureBeverages),
+            signatureBeveragesEn: listToText(data.about.en?.signatureBeverages),
+            capacityId: data.about.id?.capacity || emptyAbout.capacityId,
+            capacityEn: data.about.en?.capacity || emptyAbout.capacityEn,
+            areasId: listToText(data.about.id?.areas),
+            areasEn: listToText(data.about.en?.areas),
+            facilitiesId: listToText(data.about.id?.facilities),
+            facilitiesEn: listToText(data.about.en?.facilities),
+            videoUrl: data.about.id?.videoUrl || emptyAbout.videoUrl,
+            youtubeUrl: data.about.id?.youtubeUrl || emptyAbout.youtubeUrl,
+          });
+        }
       })
       .catch((requestError) => setError(requestError.message))
       .finally(() => setLoading(false));
@@ -105,6 +184,44 @@ export function SiteContentAdmin() {
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateAboutField(event) {
+    const { name, value } = event.target;
+    setAbout((current) => ({ ...current, [name]: value }));
+  }
+
+  function handleVideoSelect(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!['video/mp4', 'video/webm', 'video/ogg'].includes(file.type)) {
+      setError('Pilih video berformat MP4, WebM, atau OGG.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > 70 * 1024 * 1024) {
+      setError('Ukuran video maksimal 70 MB.');
+      event.target.value = '';
+      return;
+    }
+    setError('');
+    setVideoFile(file);
+  }
+
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result;
+        if (typeof result !== 'string' || !result.includes(',')) {
+          reject(new Error('File video tidak dapat dibaca.'));
+          return;
+        }
+        resolve(result.slice(result.indexOf(',') + 1));
+      };
+      reader.onerror = () => reject(new Error('File video tidak dapat dibaca.'));
+      reader.readAsDataURL(file);
+    });
   }
 
   async function handleSave(event) {
@@ -143,7 +260,45 @@ export function SiteContentAdmin() {
           },
         });
       }
-      setNotice('Konten keunikan dan filosofi berhasil disimpan.');
+      let videoUrl = about.videoUrl;
+      if (videoFile) {
+        const uploaded = await apiRequest('/api/admin/content/about-video', {
+          method: 'POST',
+          body: { contentType: videoFile.type, data: await readFileAsBase64(videoFile) },
+        });
+        videoUrl = uploaded.data.videoUrl;
+      }
+      const toList = (field) => textToList(about[field]);
+      await apiRequest('/api/admin/content/about', {
+        method: 'PUT',
+        body: {
+          id: {
+            sectionLabel: about.sectionLabelId, sectionTitle: about.sectionTitleId,
+            welcomeMessage: about.welcomeMessageId,
+            founded: about.founded, locationStory: about.locationStory,
+            story: toList('storyId'), vision: about.visionId, mission: toList('missionId'),
+            philosophy: toList('philosophyId'), tagline: about.taglineId,
+            diningDescription: about.diningDescriptionId, milestones: toList('milestonesId'),
+            signatureDishes: toList('signatureDishesId'), signatureBeverages: toList('signatureBeveragesId'),
+            capacity: about.capacityId, areas: toList('areasId'), facilities: toList('facilitiesId'),
+            videoUrl, youtubeUrl: about.youtubeUrl,
+          },
+          en: {
+            sectionLabel: about.sectionLabelEn, sectionTitle: about.sectionTitleEn,
+            welcomeMessage: about.welcomeMessageEn,
+            founded: about.founded, locationStory: about.locationStory,
+            story: toList('storyEn'), vision: about.visionEn, mission: toList('missionEn'),
+            philosophy: toList('philosophyEn'), tagline: about.taglineEn,
+            diningDescription: about.diningDescriptionEn, milestones: toList('milestonesEn'),
+            signatureDishes: toList('signatureDishesEn'), signatureBeverages: toList('signatureBeveragesEn'),
+            capacity: about.capacityEn, areas: toList('areasEn'), facilities: toList('facilitiesEn'),
+            videoUrl, youtubeUrl: about.youtubeUrl,
+          },
+        },
+      });
+      setAbout((current) => ({ ...current, videoUrl }));
+      setVideoFile(null);
+      setNotice('Konten Tentang Kami berhasil disimpan.');
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -229,6 +384,46 @@ export function SiteContentAdmin() {
           <Save size={18} />
           {saving ? 'Menyimpan...' : 'Simpan konten'}
         </button>
+      </form>
+      <form onSubmit={handleSave} className="mt-8 space-y-6 rounded-2xl bg-white p-5 shadow-soft sm:p-7">
+        <div>
+          <h2 className="font-heading text-xl font-bold text-daun-700">Tentang Kami</h2>
+          <p className="mt-1 text-sm text-daun-600">Semua daftar ditulis satu item per baris. Cerita ditulis satu paragraf per baris.</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-medium text-daun-700">Tanggal berdiri<input name="founded" value={about.founded} onChange={updateAboutField} maxLength={120} required className={inputClass} /></label>
+          <label className="text-sm font-medium text-daun-700">Lokasi cerita<input name="locationStory" value={about.locationStory} onChange={updateAboutField} maxLength={120} required className={inputClass} /></label>
+          {[
+            ['sectionLabelId', 'Label bagian Bahasa Indonesia'], ['sectionLabelEn', 'Label bagian Bahasa Inggris'],
+            ['sectionTitleId', 'Judul bagian Bahasa Indonesia'], ['sectionTitleEn', 'Judul bagian Bahasa Inggris'],
+            ['welcomeMessageId', 'Pesan penutup Bahasa Indonesia'], ['welcomeMessageEn', 'Pesan penutup Bahasa Inggris'],
+          ].map(([name, label]) => (
+            <label key={name} className="text-sm font-medium text-daun-700">{label}<input name={name} value={about[name]} onChange={updateAboutField} maxLength={300} required className={inputClass} /></label>
+          ))}
+          {[
+            ['storyId', 'Cerita Bahasa Indonesia', 8], ['storyEn', 'Cerita Bahasa Inggris', 8],
+            ['visionId', 'Visi Bahasa Indonesia', 4], ['visionEn', 'Visi Bahasa Inggris', 4],
+            ['missionId', 'Misi Bahasa Indonesia', 5], ['missionEn', 'Misi Bahasa Inggris', 5],
+            ['taglineId', 'Tagline Bahasa Indonesia', 3], ['taglineEn', 'Tagline Bahasa Inggris', 3],
+            ['diningDescriptionId', 'Deskripsi pengalaman Bahasa Indonesia', 4], ['diningDescriptionEn', 'Deskripsi pengalaman Bahasa Inggris', 4],
+            ['milestonesId', 'Milestone Bahasa Indonesia', 6], ['milestonesEn', 'Milestone Bahasa Inggris', 6],
+            ['signatureDishesId', 'Menu signature Bahasa Indonesia', 5], ['signatureDishesEn', 'Menu signature Bahasa Inggris', 5],
+            ['signatureBeveragesId', 'Minuman signature Bahasa Indonesia', 5], ['signatureBeveragesEn', 'Minuman signature Bahasa Inggris', 5],
+            ['capacityId', 'Kapasitas Bahasa Indonesia', 2], ['capacityEn', 'Kapasitas Bahasa Inggris', 2],
+            ['areasId', 'Area Bahasa Indonesia', 4], ['areasEn', 'Area Bahasa Inggris', 4],
+            ['facilitiesId', 'Fasilitas Bahasa Indonesia', 8], ['facilitiesEn', 'Fasilitas Bahasa Inggris', 8],
+            ['philosophyId', 'Filosofi Bahasa Indonesia', 6], ['philosophyEn', 'Filosofi Bahasa Inggris', 6],
+          ].map(([name, label, rows]) => (
+            <label key={name} className="text-sm font-medium text-daun-700">
+              {label}
+              <textarea name={name} value={about[name]} onChange={updateAboutField} required rows={rows} className={inputClass} />
+            </label>
+          ))}
+          <label className="text-sm font-medium text-daun-700">URL YouTube<input name="youtubeUrl" type="url" value={about.youtubeUrl} onChange={updateAboutField} maxLength={500} required className={inputClass} /></label>
+          <label className="text-sm font-medium text-daun-700">Upload video (MP4/WebM/OGG, maksimal 70 MB)<input type="file" accept="video/mp4,video/webm,video/ogg" onChange={handleVideoSelect} className={`${inputClass} file:mr-3 file:rounded file:border-0 file:bg-daun-100 file:px-3 file:py-1.5`} /></label>
+        </div>
+        <p className="text-xs text-daun-500">Video saat ini: {about.videoUrl}</p>
+        <button type="submit" disabled={saving} className="btn-primary disabled:cursor-not-allowed disabled:opacity-60"><Save size={18} />{saving ? 'Menyimpan...' : 'Simpan Tentang Kami'}</button>
       </form>
     </div>
   );

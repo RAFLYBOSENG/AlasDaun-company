@@ -9,6 +9,10 @@ export async function apiRequest(path, { method = 'GET', body } = {}) {
     headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);
   }
+  if (['POST', 'PUT', 'DELETE'].includes(method)) {
+    const csrfToken = window.sessionStorage.getItem('alasdaun_csrf');
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  }
 
   let response;
   try {

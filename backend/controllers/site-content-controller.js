@@ -1,7 +1,19 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { getPool } from '../database.js';
 import { isAdminRequest } from './auth-controller.js';
 
 const CONTENT_FIELDS = 'content_key AS "key", value_id AS "id", value_en AS "en"';
+const ABOUT_VIDEO_DIRECTORY = fileURLToPath(
+  new URL('../../frontend/public/vidaboutus/', import.meta.url),
+);
+const MAX_ABOUT_VIDEO_BYTES = 70 * 1024 * 1024;
+const VIDEO_TYPES = {
+  'video/mp4': { extension: 'mp4', matches: (data) => data.toString('ascii', 4, 8) === 'ftyp' },
+  'video/webm': { extension: 'webm', matches: (data) => data.toString('ascii', 0, 4) === '\x1aE\xdf\xa3' },
+  'video/ogg': { extension: 'ogv', matches: (data) => data.toString('ascii', 0, 4) === 'OggS' },
+};
 const CONTENT_TYPES = {
   uniquenessLabel: 'text',
   uniquenessTagline: 'text',
@@ -10,6 +22,7 @@ const CONTENT_TYPES = {
   uniquenessFeature2: 'feature',
   uniquenessFeature3: 'feature',
   uniquenessFeature4: 'feature',
+  about: 'about',
 };
 
 function response(status, body) {
@@ -51,6 +64,49 @@ function validateValue(key, value) {
       || enTitle.length > 120 || enDescription.length > 1000) {
       return 'Judul dan deskripsi kartu wajib diisi; judul maksimal 120 karakter dan deskripsi maksimal 1000 karakter.';
     }
+
+    if (type === 'about') {
+      const validateLanguage = (language) => {
+        if (!language || typeof language !== 'object' || Array.isArray(language)) return null;
+        const text = (field, max) => typeof language[field] === 'string'
+          && language[field].trim() && language[field].trim().length <= max
+          ? language[field].trim() : null;
+        const list = (field, maxItems = 30, maxLength = 500) => (
+          Array.isArray(language[field])
+            && language[field].length > 0
+            && language[field].length <= maxItems
+            && language[field].every((item) => typeof item === 'string'
+              && item.trim() && item.trim().length <= maxLength)
+            ? language[field].map((item) => item.trim()) : null
+        );
+        const result = {
+          sectionLabel: text('sectionLabel', 200),
+          sectionTitle: text('sectionTitle', 300),
+          welcomeMessage: text('welcomeMessage', 300),
+          founded: text('founded', 120),
+          locationStory: text('locationStory', 120),
+          story: list('story', 10, 2000),
+          vision: text('vision', 1000),
+          mission: list('mission', 30, 1000),
+          philosophy: list('philosophy', 30, 120),
+          tagline: text('tagline', 300),
+          diningDescription: text('diningDescription', 1000),
+          milestones: list('milestones', 30, 500),
+          signatureDishes: list('signatureDishes', 30, 120),
+          signatureBeverages: list('signatureBeverages', 30, 120),
+          capacity: text('capacity', 120),
+          areas: list('areas', 30, 120),
+          facilities: list('facilities', 50, 160),
+          videoUrl: text('videoUrl', 2000),
+          youtubeUrl: text('youtubeUrl', 500),
+        };
+        return Object.values(result).some((item) => item === null) ? null : result;
+      };
+      const id = validateLanguage(value.id);
+      const en = validateLanguage(value.en);
+      if (!id || !en) return 'Data Tentang Kami belum lengkap atau melebihi batas karakter.';
+      return { id, en };
+    }
     return {
       id: { title: idTitle, description: idDescription },
       en: { title: enTitle, description: enDescription },
@@ -68,6 +124,30 @@ function validateValue(key, value) {
     return 'Filosofi harus berisi 1 sampai 30 item dengan maksimal 120 karakter.';
   }
   return { id, en };
+}
+
+export async function uploadAboutVideo(request, body) {
+  if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
+  const contentType = typeof body.contentType === 'string' ? body.contentType.toLowerCase() : '';
+  const videoType = VIDEO_TYPES[contentType];
+  if (!videoType || typeof body.data !== 'string') {
+    return response(400, { error: 'Format video harus MP4, WebM, atau OGG.' });
+  }
+  if (body.data.length > Math.ceil(MAX_ABOUT_VIDEO_BYTES * 4 / 3) + 4
+    || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.data)) {
+    return response(400, { error: 'Video tidak valid atau ukurannya melebihi 70 MB.' });
+  }
+  const videoData = Buffer.from(body.data, 'base64');
+  if (videoData.length === 0 || videoData.length > MAX_ABOUT_VIDEO_BYTES || !videoType.matches(videoData)) {
+    return response(400, { error: 'Isi video tidak cocok dengan format atau ukurannya melebihi 70 MB.' });
+  }
+  if (process.env.VERCEL) {
+    return response(201, { data: { videoUrl: `data:${contentType};base64,${body.data}` } });
+  }
+  await mkdir(ABOUT_VIDEO_DIRECTORY, { recursive: true });
+  const filename = `about-${Date.now()}.${videoType.extension}`;
+  await writeFile(join(ABOUT_VIDEO_DIRECTORY, filename), videoData, { flag: 'wx' });
+  return response(201, { data: { videoUrl: `/vidaboutus/${filename}` } });
 }
 
 export async function listSiteContent() {

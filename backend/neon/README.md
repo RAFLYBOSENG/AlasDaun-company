@@ -173,10 +173,11 @@ npm run dev
 
 `menu:seed` menyalin daftar menu lama dari frontend satu kali dan membatalkan
 operasi jika tabel sudah berisi data. Setelah itu, perubahan menu dilakukan
-melalui halaman admin, bukan file data statis. Buka `http://localhost:5173/admin-portal`
-untuk login dan mengelola menu. API publik `GET /api/menu` hanya mengirim menu
-aktif; endpoint `/api/admin/menu` memerlukan sesi admin. Jalur tersebut dapat
-diganti dengan environment frontend `VITE_ADMIN_PATH`.
+melalui halaman admin, bukan file data statis. Atur `VITE_ADMIN_PATH` pada
+`frontend/.env`, misalnya `/Admin-PAlasDaun`, lalu buka URL tersebut
+untuk login dan mengelola menu. Semua akses admin tetap memerlukan sesi login,
+dan endpoint mutasi memerlukan token CSRF. API publik `GET /api/menu` hanya
+mengirim menu aktif.
 
 Pada development lokal, foto dapat dipilih dari komputer. Backend menyimpannya
 di `frontend/public/asset/images/menu`.
