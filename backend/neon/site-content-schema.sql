@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS public.site_content (
 INSERT INTO public.site_content (content_key, value_id, value_en)
 VALUES
   (
+    'hero',
+    '{"imageUrls":["https://images.pexels.com/photos/37303212/pexels-photo-37303212.jpeg?auto=compress&cs=tinysrgb&w=1600"]}'::jsonb,
+    '{"imageUrls":["https://images.pexels.com/photos/37303212/pexels-photo-37303212.jpeg?auto=compress&cs=tinysrgb&w=1600"]}'::jsonb
+  ),
+  (
     'uniquenessLabel',
     '"KEUNIKAN ALAS DAUN"'::jsonb,
     '"WHAT MAKES US UNIQUE"'::jsonb

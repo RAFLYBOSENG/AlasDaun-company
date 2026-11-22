@@ -47,7 +47,7 @@ function MainSite() {
     return (<div className="min-w-0 overflow-x-hidden">
       <Navbar />
       <main>
-        <AnimatedSection><Hero /></AnimatedSection>
+        <AnimatedSection><Hero heroContent={siteContent?.hero} /></AnimatedSection>
         <AnimatedSection delay={0.05}>
           <Uniqueness
             labelContent={siteContent?.uniquenessLabel}

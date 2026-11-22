@@ -24,6 +24,7 @@ import {
 import {
   listAdminSiteContent,
   listSiteContent,
+  uploadHeroImage,
   uploadAboutVideo,
   updateSiteContent,
 } from '../controllers/site-content-controller.js';
@@ -57,6 +58,7 @@ const routes = [
   { method: 'POST', path: '/api/admin/menu/image', handler: ({ request, body }) => uploadMenuImage(request, body) },
   { method: 'GET', path: '/api/admin/menu', handler: ({ request }) => listAdminMenu(request) },
   { method: 'GET', path: '/api/admin/content', handler: ({ request }) => listAdminSiteContent(request) },
+  { method: 'POST', path: '/api/admin/content/hero-image', handler: ({ request, body }) => uploadHeroImage(request, body) },
   { method: 'POST', path: '/api/admin/content/about-video', handler: ({ request, body }) => uploadAboutVideo(request, body) },
   { method: 'POST', path: '/api/admin/menu', handler: ({ request, body }) => createMenu(request, body) },
   {

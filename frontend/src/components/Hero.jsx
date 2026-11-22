@@ -2,18 +2,45 @@ import { useEffect, useState } from 'react';
 import { UtensilsCrossed, Clock } from 'lucide-react';
 import { useLang } from '../lib/language-context';
 import { isOpenNow } from '../lib/hours';
-export function Hero() {
+export function Hero({ heroContent }) {
     const { dict } = useLang();
     const [open, setOpen] = useState(isOpenNow());
+    const [activeImage, setActiveImage] = useState(0);
+    const imageUrls = (
+      heroContent?.id?.imageUrls
+      || heroContent?.imageUrls
+      || (heroContent?.id?.imageUrl ? [heroContent.id.imageUrl] : null)
+      || (heroContent?.imageUrl ? [heroContent.imageUrl] : null)
+      || ["https://images.pexels.com/photos/37303212/pexels-photo-37303212.jpeg?auto=compress&cs=tinysrgb&w=1600"]
+    );
     useEffect(() => {
         const interval = setInterval(() => setOpen(isOpenNow()), 60000);
         return () => clearInterval(interval);
     }, []);
+    useEffect(() => {
+        if (imageUrls.length < 2) return undefined;
+        const interval = setInterval(() => {
+            setActiveImage((current) => (current + 1) % imageUrls.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [imageUrls.length]);
+    useEffect(() => {
+        setActiveImage(0);
+    }, [heroContent]);
     const scrollTo = (id) => document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
     return (<section id="beranda" className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {/* Background image with overlay */}
       <div className="absolute inset-0">
-        <img src="https://images.pexels.com/photos/37303212/pexels-photo-37303212.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="Hidangan Indonesia di atas daun pisang" className="h-full w-full object-cover" loading="eager" fetchpriority="high"/>
+        {imageUrls.map((imageUrl, index) => (
+          <img
+            key={imageUrl}
+            src={imageUrl}
+            alt="Hidangan Indonesia di atas daun pisang"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${index === activeImage ? 'opacity-100' : 'opacity-0'}`}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+          />
+        ))}
         <div className="absolute inset-0 bg-gradient-to-b from-daun-900/70 via-daun-800/55 to-daun-900/80"/>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(14,27,17,0.6)_100%)]"/>
       </div>

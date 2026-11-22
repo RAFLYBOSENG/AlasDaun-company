@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,13 +9,23 @@ const CONTENT_FIELDS = 'content_key AS "key", value_id AS "id", value_en AS "en"
 const ABOUT_VIDEO_DIRECTORY = fileURLToPath(
   new URL('../../frontend/public/vidaboutus/', import.meta.url),
 );
+const HERO_IMAGE_DIRECTORY = fileURLToPath(
+  new URL('../../frontend/public/asset/images/hero/', import.meta.url),
+);
 const MAX_ABOUT_VIDEO_BYTES = 70 * 1024 * 1024;
+const MAX_HERO_IMAGE_BYTES = 5 * 1024 * 1024;
+const HERO_IMAGE_TYPES = {
+  'image/jpeg': { extension: 'jpg', matches: (data) => data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff },
+  'image/png': { extension: 'png', matches: (data) => data.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) },
+  'image/webp': { extension: 'webp', matches: (data) => data.toString('ascii', 0, 4) === 'RIFF' && data.toString('ascii', 8, 12) === 'WEBP' },
+};
 const VIDEO_TYPES = {
   'video/mp4': { extension: 'mp4', matches: (data) => data.toString('ascii', 4, 8) === 'ftyp' },
   'video/webm': { extension: 'webm', matches: (data) => data.toString('ascii', 0, 4) === '\x1aE\xdf\xa3' },
   'video/ogg': { extension: 'ogv', matches: (data) => data.toString('ascii', 0, 4) === 'OggS' },
 };
 const CONTENT_TYPES = {
+  hero: 'hero',
   uniquenessLabel: 'text',
   uniquenessTagline: 'text',
   philosophy: 'list',
@@ -41,6 +52,23 @@ function validateValue(key, value) {
   const type = CONTENT_TYPES[key];
   if (!type || !value || typeof value !== 'object' || Array.isArray(value)) {
     return 'Konten situs tidak valid.';
+  }
+
+  if (type === 'hero') {
+    const id = value.id && typeof value.id === 'object' ? value.id : {};
+    const en = value.en && typeof value.en === 'object' ? value.en : {};
+    const idImageUrls = Array.isArray(id.imageUrls)
+      ? id.imageUrls.map((item) => typeof item === 'string' ? item.trim() : '').filter(Boolean)
+      : typeof id.imageUrl === 'string' ? [id.imageUrl.trim()].filter(Boolean) : [];
+    const enImageUrls = Array.isArray(en.imageUrls)
+      ? en.imageUrls.map((item) => typeof item === 'string' ? item.trim() : '').filter(Boolean)
+      : typeof en.imageUrl === 'string' ? [en.imageUrl.trim()].filter(Boolean) : [];
+    if (idImageUrls.length === 0 || idImageUrls.length > 20
+      || idImageUrls.some((item) => item.length > 2000)
+      || JSON.stringify(idImageUrls) !== JSON.stringify(enImageUrls)) {
+      return 'Gambar banner wajib diisi, maksimal 20 gambar, dan URL tidak valid.';
+    }
+    return { id: { imageUrls: idImageUrls }, en: { imageUrls: enImageUrls } };
   }
 
   if (type === 'text') {
@@ -124,6 +152,30 @@ function validateValue(key, value) {
     return 'Filosofi harus berisi 1 sampai 30 item dengan maksimal 120 karakter.';
   }
   return { id, en };
+}
+
+export async function uploadHeroImage(request, body) {
+  if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
+  const contentType = typeof body.contentType === 'string' ? body.contentType.toLowerCase() : '';
+  const imageType = HERO_IMAGE_TYPES[contentType];
+  if (!imageType || typeof body.data !== 'string') {
+    return response(400, { error: 'Format gambar banner harus JPEG, PNG, atau WebP.' });
+  }
+  if (body.data.length > Math.ceil(MAX_HERO_IMAGE_BYTES * 4 / 3) + 4
+    || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.data)) {
+    return response(400, { error: 'Gambar tidak valid atau ukurannya melebihi 5 MB.' });
+  }
+  const imageData = Buffer.from(body.data, 'base64');
+  if (imageData.length === 0 || imageData.length > MAX_HERO_IMAGE_BYTES || !imageType.matches(imageData)) {
+    return response(400, { error: 'Isi gambar tidak cocok dengan format atau ukurannya melebihi 5 MB.' });
+  }
+  if (process.env.VERCEL) {
+    return response(201, { data: { imageUrl: `data:${contentType};base64,${body.data}` } });
+  }
+  await mkdir(HERO_IMAGE_DIRECTORY, { recursive: true });
+  const filename = `hero-${randomUUID()}.${imageType.extension}`;
+  await writeFile(join(HERO_IMAGE_DIRECTORY, filename), imageData, { flag: 'wx' });
+  return response(201, { data: { imageUrl: `/asset/images/hero/${filename}` } });
 }
 
 export async function uploadAboutVideo(request, body) {

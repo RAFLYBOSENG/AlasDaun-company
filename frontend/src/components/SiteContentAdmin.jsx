@@ -4,6 +4,7 @@ import { apiRequest } from '../lib/api';
 import { companyProfile, restaurantInfo } from '../data/content';
 
 const emptyForm = {
+  heroImageUrls: ['https://images.pexels.com/photos/37303212/pexels-photo-37303212.jpeg?auto=compress&cs=tinysrgb&w=1600'],
   labelId: '',
   labelEn: '',
   taglineId: '',
@@ -104,6 +105,8 @@ export function SiteContentAdmin() {
   const [form, setForm] = useState(emptyForm);
   const [about, setAbout] = useState(emptyAbout);
   const [videoFile, setVideoFile] = useState(null);
+  const [heroImageFiles, setHeroImageFiles] = useState([]);
+  const [heroPreviewUrls, setHeroPreviewUrls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -114,6 +117,11 @@ export function SiteContentAdmin() {
     apiRequest('/api/admin/content')
       .then(({ data }) => {
         setForm({
+          heroImageUrls: data.hero?.id?.imageUrls?.length
+            ? data.hero.id.imageUrls
+            : data.hero?.id?.imageUrl
+              ? [data.hero.id.imageUrl]
+              : emptyForm.heroImageUrls,
           labelId: data.uniquenessLabel?.id || 'KEUNIKAN ALAS DAUN',
           labelEn: data.uniquenessLabel?.en || 'WHAT MAKES US UNIQUE',
           taglineId: data.uniquenessTagline?.id || '',
@@ -191,6 +199,29 @@ export function SiteContentAdmin() {
     setAbout((current) => ({ ...current, [name]: value }));
   }
 
+  function handleHeroImageSelect(event) {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+    if (files.some((file) => !['image/jpeg', 'image/png', 'image/webp'].includes(file.type))) {
+      setError('Pilih gambar banner berformat JPEG, PNG, atau WebP.');
+      event.target.value = '';
+      return;
+    }
+    if (files.some((file) => file.size > 5 * 1024 * 1024)) {
+      setError('Ukuran setiap gambar banner maksimal 5 MB.');
+      event.target.value = '';
+      return;
+    }
+    if (form.heroImageUrls.length + files.length > 20) {
+      setError('Maksimal 20 gambar banner.');
+      event.target.value = '';
+      return;
+    }
+    setError('');
+    setHeroImageFiles(files);
+    setHeroPreviewUrls(files.map((file) => URL.createObjectURL(file)));
+  }
+
   function handleVideoSelect(event) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -230,6 +261,19 @@ export function SiteContentAdmin() {
     setError('');
     setNotice('');
     try {
+      const uploadedHeroUrls = [];
+      for (const file of heroImageFiles) {
+        const uploaded = await apiRequest('/api/admin/content/hero-image', {
+          method: 'POST',
+          body: { contentType: file.type, data: await readFileAsBase64(file) },
+        });
+        uploadedHeroUrls.push(uploaded.data.imageUrl);
+      }
+      const heroImageUrls = [...form.heroImageUrls, ...uploadedHeroUrls];
+      await apiRequest('/api/admin/content/hero', {
+        method: 'PUT',
+        body: { id: { imageUrls: heroImageUrls }, en: { imageUrls: heroImageUrls } },
+      });
       await apiRequest('/api/admin/content/uniquenessLabel', {
         method: 'PUT',
         body: { id: form.labelId, en: form.labelEn },
@@ -297,8 +341,12 @@ export function SiteContentAdmin() {
         },
       });
       setAbout((current) => ({ ...current, videoUrl }));
+      setForm((current) => ({ ...current, heroImageUrls }));
       setVideoFile(null);
-      setNotice('Konten Tentang Kami berhasil disimpan.');
+      setHeroImageFiles([]);
+      heroPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+      setHeroPreviewUrls([]);
+      setNotice('Konten website berhasil disimpan.');
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -317,6 +365,42 @@ export function SiteContentAdmin() {
       {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
       {notice && <p role="status" className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{notice}</p>}
       <form onSubmit={handleSave} className="space-y-6 rounded-2xl bg-white p-5 shadow-soft sm:p-7">
+        <section>
+          <h2 className="font-heading text-xl font-bold text-daun-700">Background Banner Beranda</h2>
+          <p className="mt-1 text-sm text-daun-600">Pilih beberapa gambar. Banner akan berubah setiap 3 detik dengan transisi halus.</p>
+          <label className="mt-4 block text-sm font-medium text-daun-700">
+            Upload gambar (JPEG/PNG/WebP, maksimal 5 MB per gambar)
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={handleHeroImageSelect}
+              className={`${inputClass} file:mr-3 file:rounded file:border-0 file:bg-daun-100 file:px-3 file:py-1.5`}
+            />
+          </label>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {form.heroImageUrls.map((imageUrl, index) => (
+              <div key={imageUrl} className="relative">
+                <img src={imageUrl} alt={`Banner tersimpan ${index + 1}`} className="h-28 w-full rounded-lg object-cover" />
+                {form.heroImageUrls.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setForm((current) => ({
+                      ...current,
+                      heroImageUrls: current.heroImageUrls.filter((_, itemIndex) => itemIndex !== index),
+                    }))}
+                    className="absolute right-2 top-2 rounded-full bg-daun-900/80 px-2 py-1 text-xs text-white"
+                  >
+                    Hapus
+                  </button>
+                )}
+              </div>
+            ))}
+            {heroPreviewUrls.map((previewUrl, index) => (
+              <img key={previewUrl} src={previewUrl} alt={`Pratinjau banner baru ${index + 1}`} className="h-28 w-full rounded-lg object-cover ring-2 ring-oranye-300" />
+            ))}
+          </div>
+        </section>
         <section>
           <h2 className="font-heading text-xl font-bold text-daun-700">Tagline Keunikan Alas Daun</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
