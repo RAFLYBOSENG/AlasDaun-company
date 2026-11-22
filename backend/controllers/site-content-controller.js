@@ -60,15 +60,18 @@ function validateValue(key, value) {
     const idImageUrls = Array.isArray(id.imageUrls)
       ? id.imageUrls.map((item) => typeof item === 'string' ? item.trim() : '').filter(Boolean)
       : typeof id.imageUrl === 'string' ? [id.imageUrl.trim()].filter(Boolean) : [];
-    const enImageUrls = Array.isArray(en.imageUrls)
-      ? en.imageUrls.map((item) => typeof item === 'string' ? item.trim() : '').filter(Boolean)
-      : typeof en.imageUrl === 'string' ? [en.imageUrl.trim()].filter(Boolean) : [];
+    const validImageUrl = (item) => (
+      item.startsWith('/asset/images/hero/')
+      || item.startsWith('/vidaboutus/')
+      || item.startsWith('http://')
+      || item.startsWith('https://')
+      || /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/i.test(item)
+    );
     if (idImageUrls.length === 0 || idImageUrls.length > 20
-      || idImageUrls.some((item) => item.length > 2000)
-      || JSON.stringify(idImageUrls) !== JSON.stringify(enImageUrls)) {
-      return 'Gambar banner wajib diisi, maksimal 20 gambar, dan URL tidak valid.';
+      || idImageUrls.some((item) => item.length > 8 * 1024 * 1024 || !validImageUrl(item))) {
+      return 'Gambar banner wajib diisi, maksimal 20 gambar, dan format URL tidak valid.';
     }
-    return { id: { imageUrls: idImageUrls }, en: { imageUrls: enImageUrls } };
+    return { id: { imageUrls: idImageUrls }, en: { imageUrls: idImageUrls } };
   }
 
   if (type === 'text') {

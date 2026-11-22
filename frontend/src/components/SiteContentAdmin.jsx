@@ -255,7 +255,7 @@ export function SiteContentAdmin() {
     });
   }
 
-  async function handleSave(event) {
+  async function handleSaveHero(event) {
     event.preventDefault();
     setSaving(true);
     setError('');
@@ -274,6 +274,24 @@ export function SiteContentAdmin() {
         method: 'PUT',
         body: { id: { imageUrls: heroImageUrls }, en: { imageUrls: heroImageUrls } },
       });
+      setForm((current) => ({ ...current, heroImageUrls }));
+      setHeroImageFiles([]);
+      heroPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+      setHeroPreviewUrls([]);
+      setNotice('Gambar banner berhasil disimpan.');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleSave(event) {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    setNotice('');
+    try {
       await apiRequest('/api/admin/content/uniquenessLabel', {
         method: 'PUT',
         body: { id: form.labelId, en: form.labelEn },
@@ -341,11 +359,7 @@ export function SiteContentAdmin() {
         },
       });
       setAbout((current) => ({ ...current, videoUrl }));
-      setForm((current) => ({ ...current, heroImageUrls }));
       setVideoFile(null);
-      setHeroImageFiles([]);
-      heroPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-      setHeroPreviewUrls([]);
       setNotice('Konten website berhasil disimpan.');
     } catch (requestError) {
       setError(requestError.message);
@@ -364,7 +378,7 @@ export function SiteContentAdmin() {
       </div>
       {error && <p role="alert" className="mb-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
       {notice && <p role="status" className="mb-5 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{notice}</p>}
-      <form onSubmit={handleSave} className="space-y-6 rounded-2xl bg-white p-5 shadow-soft sm:p-7">
+      <form onSubmit={handleSaveHero} className="space-y-6 rounded-2xl bg-white p-5 shadow-soft sm:p-7">
         <section>
           <h2 className="font-heading text-xl font-bold text-daun-700">Background Banner Beranda</h2>
           <p className="mt-1 text-sm text-daun-600">Pilih beberapa gambar. Banner akan berubah setiap 3 detik dengan transisi halus.</p>
@@ -401,6 +415,12 @@ export function SiteContentAdmin() {
             ))}
           </div>
         </section>
+        <button type="submit" disabled={saving} className="btn-primary disabled:cursor-not-allowed disabled:opacity-60">
+          <Save size={18} />
+          {saving ? 'Menyimpan...' : 'Simpan gambar banner'}
+        </button>
+      </form>
+      <form onSubmit={handleSave} className="mt-8 space-y-6 rounded-2xl bg-white p-5 shadow-soft sm:p-7">
         <section>
           <h2 className="font-heading text-xl font-bold text-daun-700">Tagline Keunikan Alas Daun</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
