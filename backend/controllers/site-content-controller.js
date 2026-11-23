@@ -95,53 +95,53 @@ function validateValue(key, value) {
       || enTitle.length > 120 || enDescription.length > 1000) {
       return 'Judul dan deskripsi kartu wajib diisi; judul maksimal 120 karakter dan deskripsi maksimal 1000 karakter.';
     }
-
-    if (type === 'about') {
-      const validateLanguage = (language) => {
-        if (!language || typeof language !== 'object' || Array.isArray(language)) return null;
-        const text = (field, max) => typeof language[field] === 'string'
-          && language[field].trim() && language[field].trim().length <= max
-          ? language[field].trim() : null;
-        const list = (field, maxItems = 30, maxLength = 500) => (
-          Array.isArray(language[field])
-            && language[field].length > 0
-            && language[field].length <= maxItems
-            && language[field].every((item) => typeof item === 'string'
-              && item.trim() && item.trim().length <= maxLength)
-            ? language[field].map((item) => item.trim()) : null
-        );
-        const result = {
-          sectionLabel: text('sectionLabel', 200),
-          sectionTitle: text('sectionTitle', 300),
-          welcomeMessage: text('welcomeMessage', 300),
-          founded: text('founded', 120),
-          locationStory: text('locationStory', 120),
-          story: list('story', 10, 2000),
-          vision: text('vision', 1000),
-          mission: list('mission', 30, 1000),
-          philosophy: list('philosophy', 30, 120),
-          tagline: text('tagline', 300),
-          diningDescription: text('diningDescription', 1000),
-          milestones: list('milestones', 30, 500),
-          signatureDishes: list('signatureDishes', 30, 120),
-          signatureBeverages: list('signatureBeverages', 30, 120),
-          capacity: text('capacity', 120),
-          areas: list('areas', 30, 120),
-          facilities: list('facilities', 50, 160),
-          videoUrl: text('videoUrl', 2000),
-          youtubeUrl: text('youtubeUrl', 500),
-        };
-        return Object.values(result).some((item) => item === null) ? null : result;
-      };
-      const id = validateLanguage(value.id);
-      const en = validateLanguage(value.en);
-      if (!id || !en) return 'Data Tentang Kami belum lengkap atau melebihi batas karakter.';
-      return { id, en };
-    }
     return {
       id: { title: idTitle, description: idDescription },
       en: { title: enTitle, description: enDescription },
     };
+  }
+
+  if (type === 'about') {
+    const validateLanguage = (language) => {
+      if (!language || typeof language !== 'object' || Array.isArray(language)) return null;
+      const text = (field, max) => typeof language[field] === 'string'
+        && language[field].trim() && language[field].trim().length <= max
+        ? language[field].trim() : null;
+      const list = (field, maxItems = 30, maxLength = 500) => (
+        Array.isArray(language[field])
+          && language[field].length > 0
+          && language[field].length <= maxItems
+          && language[field].every((item) => typeof item === 'string'
+            && item.trim() && item.trim().length <= maxLength)
+          ? language[field].map((item) => item.trim()) : null
+      );
+      const result = {
+        sectionLabel: text('sectionLabel', 200),
+        sectionTitle: text('sectionTitle', 300),
+        welcomeMessage: text('welcomeMessage', 300),
+        founded: text('founded', 120),
+        locationStory: text('locationStory', 120),
+        story: list('story', 10, 2000),
+        vision: text('vision', 1000),
+        mission: list('mission', 30, 1000),
+        philosophy: list('philosophy', 30, 120),
+        tagline: text('tagline', 300),
+        diningDescription: text('diningDescription', 1000),
+        milestones: list('milestones', 30, 500),
+        signatureDishes: list('signatureDishes', 30, 120),
+        signatureBeverages: list('signatureBeverages', 30, 120),
+        capacity: text('capacity', 120),
+        areas: list('areas', 30, 120),
+        facilities: list('facilities', 50, 160),
+        videoUrl: text('videoUrl', 2000),
+        youtubeUrl: text('youtubeUrl', 500),
+      };
+      return Object.values(result).some((item) => item === null) ? null : result;
+    };
+    const id = validateLanguage(value.id);
+    const en = validateLanguage(value.en);
+    if (!id || !en) return 'Data Tentang Kami belum lengkap atau melebihi batas karakter.';
+    return { id, en };
   }
 
   const id = Array.isArray(value.id) ? value.id.map((item) => String(item).trim()) : [];

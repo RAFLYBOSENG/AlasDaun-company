@@ -207,13 +207,13 @@ export function SiteContentAdmin() {
       event.target.value = '';
       return;
     }
-    if (files.some((file) => file.size > 5 * 1024 * 1024)) {
-      setError('Ukuran setiap gambar banner maksimal 5 MB.');
+    if (files.some((file) => file.size > 15 * 1024 * 1024)) {
+      setError('Ukuran setiap gambar banner maksimal 15 MB.');
       event.target.value = '';
       return;
     }
-    if (form.heroImageUrls.length + files.length > 20) {
-      setError('Maksimal 20 gambar banner.');
+    if (form.heroImageUrls.length + files.length > 4) {
+      setError('Maksimal 4 gambar banner agar tetap ringan untuk hosting.');
       event.target.value = '';
       return;
     }
@@ -245,14 +245,30 @@ export function SiteContentAdmin() {
       reader.onload = () => {
         const result = reader.result;
         if (typeof result !== 'string' || !result.includes(',')) {
-          reject(new Error('File video tidak dapat dibaca.'));
+          reject(new Error('File tidak dapat dibaca.'));
           return;
         }
         resolve(result.slice(result.indexOf(',') + 1));
       };
-      reader.onerror = () => reject(new Error('File video tidak dapat dibaca.'));
+      reader.onerror = () => reject(new Error('File tidak dapat dibaca.'));
       reader.readAsDataURL(file);
     });
+  }
+
+  async function compressHeroImage(file) {
+    const bitmap = await createImageBitmap(file);
+    const maxWidth = 1600;
+    const maxHeight = 1000;
+    const scale = Math.min(1, maxWidth / bitmap.width, maxHeight / bitmap.height);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext('2d');
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.72));
+    if (!blob) throw new Error('Gambar banner gagal diproses.');
+    return new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.webp`, { type: 'image/webp' });
   }
 
   async function handleSaveHero(event) {
@@ -263,9 +279,10 @@ export function SiteContentAdmin() {
     try {
       const uploadedHeroUrls = [];
       for (const file of heroImageFiles) {
+        const compressedFile = await compressHeroImage(file);
         const uploaded = await apiRequest('/api/admin/content/hero-image', {
           method: 'POST',
-          body: { contentType: file.type, data: await readFileAsBase64(file) },
+          body: { contentType: compressedFile.type, data: await readFileAsBase64(compressedFile) },
         });
         uploadedHeroUrls.push(uploaded.data.imageUrl);
       }
@@ -383,7 +400,7 @@ export function SiteContentAdmin() {
           <h2 className="font-heading text-xl font-bold text-daun-700">Background Banner Beranda</h2>
           <p className="mt-1 text-sm text-daun-600">Pilih beberapa gambar. Banner akan berubah setiap 3 detik dengan transisi halus.</p>
           <label className="mt-4 block text-sm font-medium text-daun-700">
-            Upload gambar (JPEG/PNG/WebP, maksimal 5 MB per gambar)
+            Upload gambar (JPEG/PNG/WebP, maksimal 15 MB per gambar; akan dikompresi otomatis)
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
