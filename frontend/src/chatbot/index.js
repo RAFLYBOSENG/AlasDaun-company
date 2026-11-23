@@ -13,7 +13,14 @@ function isAdminRoute() {
     || window.location.hash.startsWith(`#${adminPath}/`);
 }
 
+function isLinkInBioRoute() {
+  return window.location.pathname === '/links'
+    || /^#\/?links(?:$|\/)/.test(window.location.hash);
+}
+
 async function initChat() {
+  if (isAdminRoute() || isLinkInBioRoute()) return;
+
   const chatOptions = {
     webhookUrl: chatbotConfig.webhookUrl,
     initialMessages: chatbotConfig.initialMessages,
@@ -22,6 +29,7 @@ async function initChat() {
 
   try {
     const { createChat } = await import(/* @vite-ignore */ CHAT_BUNDLE_URL);
+    if (isAdminRoute() || isLinkInBioRoute()) return;
     createChat(chatOptions);
   } catch (error) {
     console.error('Chatbot Alas Daun gagal dimuat.', error);
@@ -29,7 +37,7 @@ async function initChat() {
 }
 
 function syncChatVisibility() {
-  if (!isAdminRoute()) {
+  if (!isAdminRoute() && !isLinkInBioRoute()) {
     if (!document.querySelector('n8n-chat')) initChat();
     return;
   }
