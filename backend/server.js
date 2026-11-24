@@ -27,8 +27,9 @@ function sendJson(response, status, body, extraHeaders = {}) {
   response.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': frontendOrigin,
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    ...(frontendOrigin !== '*' ? { 'Access-Control-Allow-Credentials': 'true' } : {}),
     ...extraHeaders,
     Vary: 'Origin',
   });

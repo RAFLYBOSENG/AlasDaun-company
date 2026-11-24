@@ -1,7 +1,14 @@
+import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { getPool } from '../database.js';
 import { isAdminRequest } from './auth-controller.js';
 
 const MAX_MEDIA_BYTES = 3 * 1024 * 1024;
+const GALLERY_MEDIA_DIRECTORY = fileURLToPath(
+  new URL('../../frontend/public/asset/images/gallery/', import.meta.url),
+);
 const GALLERY_CATEGORIES = ['momen_di_alas_daun', 'tempat_di_alas_daun', 'behind_the_scene'];
 const LEGACY_CATEGORY = {
   moments: 'momen_di_alas_daun',
@@ -42,16 +49,23 @@ function validId(id) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
 }
 
-function validate(body) {
+export function validateGalleryItem(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return 'Data galeri tidak valid.';
   const type = body.type === 'video' ? 'video' : body.type === 'image' ? 'image' : '';
-  const category = GALLERY_CATEGORIES.includes(body.category) ? body.category : '';
+  const category = GALLERY_CATEGORIES.includes(body.category)
+    ? body.category
+    : LEGACY_CATEGORY[String(body.category)] || '';
   const src = typeof body.src === 'string' ? body.src.trim() : '';
   const alt = typeof body.alt === 'string' ? body.alt.trim() : '';
   const sortOrder = body.sortOrder === '' || body.sortOrder === undefined ? 0 : Number(body.sortOrder);
   if (!type) return 'Jenis media harus berupa foto atau video.';
   if (!category) return 'Kategori galeri tidak valid.';
-  if (!src || (!src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:'))) {
+  if (!src || (
+    !src.startsWith('http://')
+    && !src.startsWith('https://')
+    && !/^data:(?:image\/(?:jpeg|png|webp|gif)|video\/(?:mp4|webm|ogg));base64,[A-Za-z0-9+/]+=*$/.test(src)
+    && !/^\/asset\/images\/gallery\/[0-9a-f-]+\.(?:jpg|png|webp|gif|mp4|webm|ogg)$/i.test(src)
+  )) {
     return 'Sumber media harus berupa URL http/https atau file yang diunggah.';
   }
   if (!alt || alt.length > 160) return 'Deskripsi galeri wajib diisi (maksimal 160 karakter).';
@@ -90,14 +104,31 @@ export async function uploadGalleryMedia(request, body) {
   if (mediaData.length === 0 || mediaData.length > MAX_MEDIA_BYTES || !mediaType.matches(mediaData)) {
     return response(400, { error: 'Isi file tidak cocok dengan format atau ukurannya melebihi 3 MB.' });
   }
+
+  if (process.env.VERCEL) {
+    return response(201, {
+      data: { type: mediaType.type, src: `data:${contentType};base64,${body.data}` },
+    });
+  }
+
+  await mkdir(GALLERY_MEDIA_DIRECTORY, { recursive: true });
+  const extension = contentType === 'image/jpeg' ? 'jpg'
+    : contentType === 'image/png' ? 'png'
+      : contentType === 'image/webp' ? 'webp'
+        : contentType === 'image/gif' ? 'gif'
+          : contentType === 'video/mp4' ? 'mp4'
+            : contentType === 'video/webm' ? 'webm'
+              : 'ogg';
+  const filename = `${randomUUID()}.${extension}`;
+  await writeFile(join(GALLERY_MEDIA_DIRECTORY, filename), mediaData, { flag: 'wx' });
   return response(201, {
-    data: { type: mediaType.type, src: `data:${contentType};base64,${body.data}` },
+    data: { type: mediaType.type, src: `/asset/images/gallery/${filename}` },
   });
 }
 
 export async function createGallery(request, body) {
   if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
-  const item = validate(body);
+  const item = validateGalleryItem(body);
   if (typeof item === 'string') return response(400, { error: item });
   const result = await getPool().query(
     `INSERT INTO public.gallery_items (category, media_type, media_url, alt_text, sort_order, is_active)
@@ -110,7 +141,7 @@ export async function createGallery(request, body) {
 export async function updateGallery(request, body, id) {
   if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
   if (!validId(id)) return response(400, { error: 'ID galeri tidak valid.' });
-  const item = validate(body);
+  const item = validateGalleryItem(body);
   if (typeof item === 'string') return response(400, { error: item });
   const result = await getPool().query(
     `UPDATE public.gallery_items SET category = $2, media_type = $3, media_url = $4,

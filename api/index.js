@@ -10,8 +10,11 @@ const frontendOrigin = process.env.FRONTEND_ORIGIN || '*';
 app.use(express.json({ limit: '96mb' }));
 app.use((request, response, next) => {
   response.setHeader('Access-Control-Allow-Origin', frontendOrigin);
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  if (frontendOrigin !== '*') {
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
   response.setHeader('Vary', 'Origin');
 
   if (request.method === 'OPTIONS') {
