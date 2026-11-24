@@ -46,7 +46,7 @@ const fields = `id, category, media_type AS "mediaType", media_url AS "mediaUrl"
   alt_text AS "altText", sort_order AS "sortOrder", is_active AS "isActive"`;
 
 function validId(id) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+  return typeof id === 'string' && id.trim().length > 0 && id.length <= 128;
 }
 
 export function validateGalleryItem(body) {
@@ -146,8 +146,8 @@ export async function updateGallery(request, body, id) {
   const result = await getPool().query(
     `UPDATE public.gallery_items SET category = $2, media_type = $3, media_url = $4,
       alt_text = $5, sort_order = $6, is_active = $7
-     WHERE id = $1 RETURNING ${fields}`,
-    [id, item.category, item.type, item.src, item.alt, item.sortOrder, item.isActive],
+     WHERE id::text = $1 RETURNING ${fields}`,
+    [id.trim(), item.category, item.type, item.src, item.alt, item.sortOrder, item.isActive],
   );
   if (!result.rows[0]) return response(404, { error: 'Media galeri tidak ditemukan.' });
   return response(200, { data: normalize(result.rows[0]) });
@@ -156,7 +156,10 @@ export async function updateGallery(request, body, id) {
 export async function deleteGallery(request, id) {
   if (!(await isAdminRequest(request.headers))) return response(401, { error: 'Unauthorized' });
   if (!validId(id)) return response(400, { error: 'ID galeri tidak valid.' });
-  const result = await getPool().query('DELETE FROM public.gallery_items WHERE id = $1', [id]);
+  const result = await getPool().query(
+    'DELETE FROM public.gallery_items WHERE id::text = $1 RETURNING id',
+    [id.trim()],
+  );
   if (!result.rowCount) return response(404, { error: 'Media galeri tidak ditemukan.' });
-  return response(204, {});
+  return response(200, { deleted: true });
 }
